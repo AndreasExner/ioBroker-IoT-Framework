@@ -6,13 +6,13 @@
 //-------------------------------------------------------
 // generic sensor config
 
-const char* ssid     = "HAL9000IOT";
-const char* password = "J79tR3D5263zkdT52";
+const char* ssid     = "yyyyyyyy";
+const char* password = "xxxxxxxx";
 
 String SensorID = "DEV";
 
-String baseURL_SENSOR_GET = "http://192.168.67.240:8087/getPlainValue/0_userdata.0.IoT-Sensors." + SensorID + ".";
-String baseURL_SENSOR_SET = "http://192.168.67.240:8087/set/0_userdata.0.IoT-Sensors." + SensorID + ".";
+String baseURL_SENSOR_GET = "http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Sensors." + SensorID + ".";
+String baseURL_SENSOR_SET = "http://192.168.1.240:8087/set/0_userdata.0.IoT-Sensors." + SensorID + ".";
 
 String URL_DevMode = baseURL_SENSOR_GET + "DevMode";
 String URL_IP = baseURL_SENSOR_SET + "SensorIP?value=";
