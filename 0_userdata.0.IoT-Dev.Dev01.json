@@ -50,29 +50,6 @@
       "state": 1636
     }
   },
-  "0_userdata.0.IoT-Dev.Dev01.Moist": {
-    "_id": "0_userdata.0.IoT-Dev.Dev01.Moist",
-    "type": "state",
-    "common": {
-      "name": "IoT-Dev.Dev01.Moist",
-      "role": "",
-      "type": "number",
-      "desc": "Manuell erzeugt",
-      "def": 0,
-      "read": true,
-      "write": true
-    },
-    "native": {},
-    "from": "system.adapter.admin.0",
-    "user": "system.user.admin",
-    "ts": 1591004399698,
-    "acl": {
-      "object": 1636,
-      "owner": "system.user.simpleapi",
-      "ownerGroup": "system.group.administrator",
-      "state": 1636
-    }
-  },
   "0_userdata.0.IoT-Dev.Dev01.Pressure": {
     "_id": "0_userdata.0.IoT-Dev.Dev01.Pressure",
     "type": "state",
