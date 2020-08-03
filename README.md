@@ -49,3 +49,15 @@ This is the minimum part of the sketch you need to change before uploading:
     
     //-------------------------------------------------------
     // generic sensor config end
+
+## Usage
+Quite simple:
+* create required the data structure in ioBroker for dev/prod
+* set the generic configuration in your sketch
+* start with DevMode = true and a low interval
+* add your own code execution into the 1 second loop (// your code here) or the 50ms loop (//execute realtime tasks here). 
+* switch between dev and prod by simply changing the DevMode object
+
+## History
+
+Initial release of version 2.0: 2020-08-03
