@@ -1,0 +1,178 @@
+  "0_userdata.0.IoT.Weather.Humidity": {
+    "_id": "0_userdata.0.IoT.Weather.Humidity",
+    "type": "state",
+    "common": {
+      "name": "IoT.Weather.Humidity",
+      "role": "",
+      "type": "number",
+      "desc": "rel. Luftfeuchtigkeit",
+      "unit": "%",
+      "min": 0,
+      "max": 100,
+      "def": 0,
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": false,
+          "debounce": "1000",
+          "retention": "63072000",
+          "changesRelogInterval": 0,
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1589378052926,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT.Weather.Interval": {
+    "_id": "0_userdata.0.IoT.Weather.Interval",
+    "type": "state",
+    "common": {
+      "name": "IoT.Weather.Interval",
+      "role": "",
+      "type": "number",
+      "desc": "Send interval",
+      "unit": "Sek.",
+      "min": 30,
+      "max": 300,
+      "def": 30,
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1589790660721,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT.Weather.Pressure": {
+    "_id": "0_userdata.0.IoT.Weather.Pressure",
+    "type": "state",
+    "common": {
+      "name": "IoT.Weather.Pressure",
+      "role": "",
+      "type": "number",
+      "desc": "Luftdruck",
+      "unit": "mbar",
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": false,
+          "debounce": "1000",
+          "retention": "2678400",
+          "changesRelogInterval": 0,
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1591520279230,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT.Weather.SensorID": {
+    "_id": "0_userdata.0.IoT.Weather.SensorID",
+    "type": "state",
+    "common": {
+      "name": "IoT.Weather.SensorID",
+      "role": "",
+      "type": "string",
+      "desc": "SensorID",
+      "def": "",
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": false,
+          "debounce": 0,
+          "maxLength": 10,
+          "retention": "432000",
+          "changesRelogInterval": 0,
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1591527602822,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT.Weather.Temperature": {
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1589378031005,
+    "common": {
+      "name": "IoT.Weather.Temperature",
+      "role": "",
+      "type": "number",
+      "desc": "Temperatur",
+      "unit": "°C",
+      "min": -50,
+      "max": 100,
+      "def": 0,
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": false,
+          "debounce": "1000",
+          "retention": "63072000",
+          "changesRelogInterval": 0,
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    },
+    "_id": "0_userdata.0.IoT.Weather.Temperature",
+    "type": "state"
+  }
+}
