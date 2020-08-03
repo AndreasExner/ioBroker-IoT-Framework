@@ -279,6 +279,9 @@ void loop() {
     build_urls();
     send_ip();
     get_interval();
+    
+    // your code here
+    
     counter = 0;
   }
   Serial.println(counter);
