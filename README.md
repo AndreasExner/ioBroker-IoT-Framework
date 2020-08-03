@@ -11,7 +11,7 @@ Working with IoT sensors and actors in ioBroker often needs a lot of development
 * You need a REST API in your ioBroker setup
 * You need to secure the REST API (for example, expose the required data only and hide any confidential and secret stuff)
 * You need a userdata section in your ioBroker objects
->* IoT-Sensors: configuration data for every individual sensor (linked with the sensor ID) sample: _userdata.0.IoT-Sensors.DEV.json or 0_userdata.0.IoT-Sensors.01.json
+>* IoT-Sensors: configuration data for every individual sensor (linked with the sensor ID) sample: 0_userdata.0.IoT-Sensors.01.json
 >* IoT-Dev: I/O data section for developement (URL’s polled from the configuration data) sample: 0_userdata.0.IoT-Dev.Dev01.json
 >* IoT: I/O data section for production (URL’s polled from the configuration data) sample: 0_userdata.0.IoT.Weather.json
 * You should know how to work with IoT devices and electronics
@@ -27,12 +27,11 @@ Working with IoT sensors and actors in ioBroker often needs a lot of development
 >* DevMode (bool): Device is in dev mode
 >* Interval (int): Poll interval
 >* baseURL_DATA_GET/SET(string): based on DevMode and configured URL’s in ioBroker. For example:
->>* http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Dev.Dev01.
+>>* http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Dev.Weather.
 >>* http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT.Weather.
 >>* http://192.168.1.240:8087/set/0_userdata.0.IoT.Weather.
 * The sensor also posts some information to ioBroker:
 >* SensorIP (string): current IP (interesting with DHCP)
->* SensorName (string): aka as SensorID, useful to identify the sensor 
 >* Reset (bool): updates timestamp in ioBroker every time the sensor starts up
 
 ## Generic sensor config
@@ -44,7 +43,7 @@ This is the minimum part of the sketch you need to change before uploading:
     const char* ssid     = "yyyyyy";
     const char* password = "xxxxxx";
     
-    String SensorID = "DEV";
+    String SensorID = "01";
     String baseURL_SENSOR_GET = "http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Sensors." + SensorID + ".";
     String baseURL_SENSOR_SET = "http://192.168.1.240:8087/set/0_userdata.0.IoT-Sensors." + SensorID + ".";
     
