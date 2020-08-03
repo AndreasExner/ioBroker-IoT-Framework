@@ -35,5 +35,18 @@ Working with IoT sensors and actors in ioBroker often needs a lot of development
 >* SensorName (string): aka as SensorID, useful to identify the sensor 
 >* Reset (bool): updates timestamp in ioBroker every time the sensor starts up
 
+## Generic sensor config
+This is the minimum part of the sketch you need to change before uploading:
 
-
+    //-------------------------------------------------------
+    // generic sensor config begin
+    
+    const char* ssid     = "yyyyyy";
+    const char* password = "xxxxxx";
+    
+    String SensorID = "DEV";
+    String baseURL_SENSOR_GET = "http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Sensors." + SensorID + ".";
+    String baseURL_SENSOR_SET = "http://192.168.1.240:8087/set/0_userdata.0.IoT-Sensors." + SensorID + ".";
+    
+    //-------------------------------------------------------
+    // generic sensor config end
