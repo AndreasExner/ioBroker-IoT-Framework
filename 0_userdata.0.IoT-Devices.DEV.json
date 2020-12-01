@@ -1,0 +1,250 @@
+{
+  "0_userdata.0.IoT-Devices.DEV.DevMode": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.DevMode",
+    "type": "state",
+    "common": {
+      "name": "DevMode",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.ErrorLog": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.ErrorLog",
+    "type": "state",
+    "common": {
+      "name": "ErrorLog",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": false,
+          "debounce": 0,
+          "maxLength": 10,
+          "retention": "31536000",
+          "changesRelogInterval": "60",
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.LED": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.LED",
+    "type": "state",
+    "common": {
+      "name": "LEDActive",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.MAC": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.MAC",
+    "type": "state",
+    "common": {
+      "name": "MAC",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.RSSI": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.RSSI",
+    "type": "state",
+    "common": {
+      "name": "RSSI",
+      "role": "",
+      "type": "number",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.Reset": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.Reset",
+    "type": "state",
+    "common": {
+      "name": "LastReset",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.SensorActive": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.SensorActive",
+    "type": "state",
+    "common": {
+      "name": "SensorActive",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.SensorIP": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.SensorIP",
+    "type": "state",
+    "common": {
+      "name": "SensorIP",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.SensorName": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.SensorName",
+    "type": "state",
+    "common": {
+      "name": "SensorName",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.baseURL_GET_DEV": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.baseURL_GET_DEV",
+    "type": "state",
+    "common": {
+      "name": "baseURL_GET_DEV",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.baseURL_GET_PROD": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.baseURL_GET_PROD",
+    "type": "state",
+    "common": {
+      "name": "baseURL_GET_PROD",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.baseURL_SET_DEV": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.baseURL_SET_DEV",
+    "type": "state",
+    "common": {
+      "name": "baseURL_SET_DEV",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.IoT-Devices.DEV.baseURL_SET_PROD": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.baseURL_SET_PROD",
+    "type": "state",
+    "common": {
+      "name": "baseURL_SET_PROD",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  }
+}
