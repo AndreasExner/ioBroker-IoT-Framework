@@ -1,63 +1,214 @@
-# ioBroker-IoT-DEV
+# ioBroker-IoT-Framework
 
-#### ioBroker IoT DEV Environment (based on NodeMCU)
+**ioBroker IoT Framework (based on NodeMCU / ESP8266)**
 
 Working with IoT sensors and actors in ioBroker often needs a lot of development and testing. Every improvement needs a staging environment as well to keep the productive data untouched. I’ve started to setup a more or less universal dev environment for IoT devices like NodeMCU or Arduino. It enables a convenient and easy way to switch between dev and prod without uploading a new image to the device. 
+
+With the **3rd generation** of the Framework I stared to include modules for hardware sensors like the BME280 to make them reusable in further projects.
+
+With the **5th generation** of the Framework was completely restructured because the long code became more and more unhandy. All generic and hardware specific sensors functions are moved the extension file AEX_iobroker_IoT_Framework.ino. 
+
+**Important:**
+
+Be sure to have this file in the same folder like the primary .ino file. Opening the primary .ino file in Arduino editor should loaded  the extension automatically.
+
+
+
+## Supported sensors
+
+- BME280 (based on the [Arduino Library for BME280 sensors](https://github.com/adafruit/Adafruit_BME280_Library))
+- BME680 (based on the [BoschSensortec Arduino library for BSEC](https://github.com/BoschSensortec/BSEC-Arduino-library))
+- SCD30 (based on the [SparkFun SCD30 Arduino Library](https://github.com/sparkfun/SparkFun_SCD30_Arduino_Library))
+- WindSensor (Analog Input)
+
+
 
 ## Prerequisites
 
 * You need a running Arduino IDE and at least basic knowledge how it works. 
 * You also need a running ioBroker instance and a little more than basic knowledge on that stuff.
 * You need a REST API in your ioBroker setup
-* You need to secure the REST API (for example, expose the required data only and hide any confidential and secret stuff)
+* You need to **secure** the REST API (for example, expose the required data only and hide any confidential and secret stuff)
 * You need a userdata section in your ioBroker objects
->* IoT-Sensors: configuration data for every individual sensor (linked with the sensor ID) sample: 0_userdata.0.IoT-Sensors.01.json
->* IoT-Dev: I/O data section for developement (URL’s polled from the configuration data) sample: 0_userdata.0.IoT-Dev.Dev01.json
->* IoT: I/O data section for production (URL’s polled from the configuration data) sample: 0_userdata.0.IoT.Weather.json
 * You should know how to work with IoT devices and electronics
 
-## How it works – the basics
 
-* The main loop has a delay of round about 1 second
->*  optional execution for (near) real time tasks every 50ms
->* 1 Hz blink interval for LED (status indicator)
->* push/pull data every x seconds (interval)
->* automatic reset when ioBroker not reachable (delayed by 30 seconds and indicated by a flashing LED)
-* The sensor connects periodically to the REST API and pulls some data. This enables you to use the deep sleep mode when your device is running on battery (not covered in this image)
->* DevMode (bool): Device is in dev mode
->* Interval (int): Poll interval
->* baseURL_DATA_GET/SET(string): based on DevMode and configured URL’s in ioBroker. For example:
->>* http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Dev.Weather.
->>* http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT.Weather.
->>* http://192.168.1.240:8087/set/0_userdata.0.IoT.Weather.
-* The sensor also posts some information to ioBroker:
->* SensorIP (string): current IP (interesting with DHCP)
->* Reset (bool): updates timestamp in ioBroker every time the sensor starts up
 
-## Generic sensor config
-This is the minimum part of the sketch you need to change before uploading:
+## Setup
 
-    //-------------------------------------------------------
-    // generic sensor config begin
-    
-    const char* ssid     = "yyyyyy";
-    const char* password = "xxxxxx";
-    
-    String SensorID = "01";
-    String baseURL_SENSOR_GET = "http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Sensors." + SensorID + ".";
-    String baseURL_SENSOR_SET = "http://192.168.1.240:8087/set/0_userdata.0.IoT-Sensors." + SensorID + ".";
-    
-    //-------------------------------------------------------
-    // generic sensor config end
+- Create a folder in your Arduino library folder
+- Copy the primary sketch (e.g. DEV_5.0.ino) and the extension file (AEX_iobroker_IoT_Framework.ino) into the folder
+- Open the primary sketch (e.g. DEV_5.0.ino) 
+- Optional: install required libraries into your Arduino IDE
+- Create (import) the datapoints in iobroker
+  - 0_userdata.0.IoT-Devices.DEV.json (generic device configuration and monitoring)
+  - 0_userdata.0.IoT-Dev.DEV.json (specific device configuration and data)
+- Set values for datapoints (see iobroker datapoints)
 
-## Usage
-Quite simple:
-* create required the data structure in ioBroker for dev/prod
-* set the generic configuration in your sketch
-* start with DevMode = true and a low interval
-* add your own code execution into the 1 second loop (// your code here) or the 50ms loop (//execute realtime tasks here). 
-* switch between dev and prod by simply changing the DevMode object
 
-## History
 
-Initial release of version 2.0: 2020-08-03
+## Configuration
+
+#### Enable / disable sensor specific functions
+
+```c++
+//+++++++++++++++++++++++++++++++++++++++++ enable sensor specific functions +++++++++++++++++++++++++++++++++++++++++++++++++
+
+#define AEX_iobroker_IoT_Framework //generic functions DO NOT CHANGE
+
+// uncomment required sections
+
+//#define BME280_active
+//#define BME680_active
+//#define SCD30_active
+//#define WindSensor_active
+```
+
+The sensor specific functions are disabled (commented) by default. 
+
+**Do not enable these function until required.** Additional code is required as well. You can find examples in my other projects.
+
+
+
+#### Generic device section
+
+```c++
+// device settings - change settings to match your requirements
+
+const char* ssid     = "<ssid>"; // Wifi SSID
+const char* password = "<password>"; //Wifi password
+
+String SensorID = "DEV"; //predefinded sensor ID, DEV by default to prevent overwriting productive data
+
+int interval = 10;  // waiting time for the first masurement and fallback on error reading interval from iobroker
+
+bool DevMode = true; //enable DEV mode on boot (do not change)
+bool debug = true; //debug to serial monitor
+bool led = true; //enable external status LED on boot
+bool sensor_active = false; // dectivate sensor(s) on boot (do not change)
+```
+
+- Enter proper Wifi information
+- The **`SensorID`** is part of the URL's and important for the the iobroker communications
+- **`Interval`** defines the delay between two data transmissions / measurements. This value is used initially after boot. The interval dynamically updates from iobroker
+- The **`DevMode`** switch prevents the device from sending data into your productive datapoints. It is enabled by default and can be overwritten dynamically from iobroker
+- **`debug`** enables a more detailed serial output
+- **`led`** enables the onboard led (status)
+- The **`sensor_active`** switch disables the loading of hardware specific code on startup. This is very useful to test a sketch on the bread board without the connected hardware. It is disabled by default and gets dynamically enabled from the iobrocker during boot, as long as nothing else is configured.
+
+
+
+#### Base URL's
+
+```c++
+/*
+ * build base URL's
+ * Change IP/FQND and path to match your environment
+ */
+
+String baseURL_DEVICE_GET = "http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Devices." + SensorID + ".";
+String baseURL_DEVICE_SET = "http://192.168.1.240:8087/set/0_userdata.0.IoT-Devices." + SensorID + ".";
+```
+
+The base url's, one for read and one to write data, are pointing to your iobroker datapoints in the devices section. The SensorID will be added to complete the path. 
+
+
+
+## iobroker datapoints
+
+#### Devices section
+
+The default path for the devices root folder is: **`0_userdata.0.IoT-Devices`**. When the path is changed, it has to be changed in the sketch as well.
+
+**It is mandatory to setup the following datapoints prior the first device boot:**
+
+- **`DevMode`** If true, the baseURL's for the IoT-Dev section are used to prevent overwriting your production data. Also see generic device section.
+
+- **`LED`** Controls the status LED. Also see generic device section.
+
+- **`SensorActive`** Controls the hardware sensors. Also see generic device section.
+
+- **`SensorName`** Easy to understand name for the sensor. Not used in the code.
+
+- **`baseURL_GET_DEV`** points to the IoT-Dev datapoints in iobroker (e.g. 0_userdata.0.IoT-Dev.DEV)
+
+  - ```
+    http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Dev.DEV.
+    ```
+
+- **`baseURL_SET_DEV`** points to the IoT-Dev datapoints in iobroker (e.g. 0_userdata.0.IoT-Dev.DEV)
+
+  - ```
+    http://192.168.1.240:8087/set/0_userdata.0.IoT-Dev.DEV.
+    ```
+
+- **`baseURL_GET_PROD`** points to the IoT datapoints in iobroker (e.g. 0_userdata.0.IoT.Weather)
+
+  - ```
+    http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT.Weather.
+    ```
+
+- **`baseURL_SET_PROD`** points to the IoT datapoints in iobroker (e.g. 0_userdata.0.IoT.Weather)
+
+  - ```
+    http://192.168.1.240:8087/set/0_userdata.0.IoT.Weather.
+    ```
+
+
+
+#### Specific device configuration and data
+
+Depending on the **`DevMode`**, the device reads config and writes data into different datapoint sections:
+
+- Development root folder: **`0_userdata.0.IoT-Dev`**
+- Production root folder: **`0_userdata.0.IoT`**
+
+It is recommended to keep the datapoints in both sections identical to avoid errors when changing the **`DevMode`**. The values can be different. In the basic template only one datapoint is mandatory:
+
+- **`Interval`** Defines the delay between two data transmissions / measurements. Also see generic device section.
+
+
+
+## How it works
+
+#### Boot phase / setup
+
+- Connect Wifi
+- Get Wifi State
+- Get the dynamic configuration from iobroker (generic devices section)
+- Build specific device URL's (based on the dynamic configuration)
+- Send devices IP address
+- Send device ID
+- Send information about the last restart / reset
+- Optional: run's setup for active sensors
+
+
+
+#### Loop
+
+The main loop has a frequency of 1 Hz and blinks the status led with 0,5 Hz (when enabled). Every n-th tick, defined by the **`Interval`**,  the following sequence will proceed:
+
+- Loop (1Hz)
+  - **`01`**
+  - Interval reached
+    - Get Wifi State (try reconnect first, then reset if not connected)
+    - Send devices IP address
+    - Get the dynamic configuration from iobroker (generic devices section)
+    - Build specific device URL's (based on the dynamic configuration)
+    - **`02`**
+    - Get the new interval (specific device section)
+  - Interval not reached
+    - **`03`**
+  - LED Blink 
+    - **`04`**
+
+
+
+#### Thread handling
+
+Depending on the requirements and the used sensors, the loop can be look completely different (e.g BME680). However, the recommended positions for additional treads are:
+
+- **`01`** Get data from sensor / serial output
+- **`02`** Send date to iobroker, run sensor setup (if required)
+- **`03`** Optional, serial output counter
+- **`04`** Can be used for "real time" task that must run more frequently then in the 1 Hz loop (not implemented in this example)
