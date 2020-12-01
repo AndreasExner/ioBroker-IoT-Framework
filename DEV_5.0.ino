@@ -57,11 +57,6 @@ String SensorID = "DEV"; //predefinded sensor ID, DEV by default to prevent over
 
 int interval = 10;  // waiting time for the first masurement and fallback on error reading interval from iobroker
 
-/*
- * The BSEC library sets the pace for the loop duration -> BSEC_LP ~ 3000 ms per request
- * For a transmission interval of 5 minutes configure an interval of 100 (*3 = 300 seconds = 5 minutes)
-*/
-
 bool DevMode = true; //enable DEV mode on boot (do not change)
 bool debug = true; //debug to serial monitor
 bool led = true; //enable external status LED on boot
