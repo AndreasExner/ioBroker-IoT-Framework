@@ -67,8 +67,8 @@ bool sensor_active = false; // dectivate sensor(s) on boot (do not change)
  * Change IP/FQND and path to match your environment
  */
 
-String baseURL_DEVICE_GET = "http://192.168.67.240:8087/getPlainValue/0_userdata.0.IoT-Devices." + SensorID + ".";
-String baseURL_DEVICE_SET = "http://192.168.67.240:8087/set/0_userdata.0.IoT-Devices." + SensorID + ".";
+String baseURL_DEVICE_GET = "http://192.168.1.240:8087/getPlainValue/0_userdata.0.IoT-Devices." + SensorID + ".";
+String baseURL_DEVICE_SET = "http://192.168.1.240:8087/set/0_userdata.0.IoT-Devices." + SensorID + ".";
 
 // end of device settings - don not change anything below the line until required
 
