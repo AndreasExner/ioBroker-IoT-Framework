@@ -24,7 +24,7 @@ Be sure to have this file in the same folder like the primary .ino file. Opening
 
 ## History
 
-Version: F5_1.3 (release) 2020-12-02
+Version: 5.0 (release) 2020-12-02
 
 
 #### Tested environment
