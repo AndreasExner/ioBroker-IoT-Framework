@@ -22,6 +22,25 @@ Be sure to have this file in the same folder like the primary .ino file. Opening
 - WindSensor (Analog Input)
 
 
+## History
+
+Version: F5_1.3 (release) 2020-12-02
+
+
+#### Tested environment
+
+- Software
+  - Arduino IDE 1.8.13 (Windows)
+  - ESP8266 hardware package 2.7.4
+  - Adafruit_BME280_Library version 2.1.2
+  - BSEC-Arduino-library 1.6.1480
+  - SparkFun_SCD30_Arduino_Library release 9
+- Hardware
+  - NodeMCU Lolin V3 (ESP8266MOD 12-F)
+  - GY-BME280
+  - CJMCU-680 BME680
+  - Sensirion SCD30
+
 
 ## Prerequisites
 
