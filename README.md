@@ -13,6 +13,13 @@ With the **5th generation** of the Framework was completely restructured because
 Be sure to have this file in the same folder like the primary .ino file. Opening the primary .ino file in Arduino editor should loaded  the extension automatically.
 
 
+**Released projects**
+- [Highly precise indoor air sensor (HTP, CO2 and IAQ)](https://github.com/AndreasExner/ioBroker-IoT-IndoorAirSensor)
+- Outdoor partical matter sensor (to be documented)
+- Highly precise weather monitoring (HTP and rain) (to be documented)
+- Wind speed and direction monitoring (to be finished soon)
+- Water tank monitoring (to be revised in spring CY21)
+- Garden sprinkler valve and soil moisture monitoring (to be revised in spring CY21)
 
 ## Supported sensors
 
