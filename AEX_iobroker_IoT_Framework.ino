@@ -2,8 +2,8 @@
 
   Shared functions for iobroker IoT Framework
 
-  Version: V5 (release)
-  Date: 2020-11-30
+  Version: V5.2.0
+  Date: 2020-12-06
 
   Supported features / sensors:
 
@@ -11,6 +11,8 @@
   - BME280
   - BME680
   - SCD30
+  - SPS30
+  - WindSensor
 
   https://github.com/AndreasExner/ioBroker-IoT-Framework
 
@@ -360,6 +362,15 @@ String bool_to_string(bool input) {
     return "false";
   }
 
+}
+
+String hex_to_string(uint8_t hex) {
+  
+  char hex_char[4];
+  sprintf(hex_char, "%02x", hex);
+  String hex_string = hex_char;
+  hex_string.toUpperCase();
+  return ("0x" + hex_string);
 }
 #endif
 
@@ -743,42 +754,35 @@ void SCD30_get_data() {
 
 void SCD30_AutoCal() {
 
-  if (debug) {
-    Serial.println("### SCD30_AutoCal");
-  }
+  if (debug) {Serial.println("### SCD30_AutoCal");}
+
+  String scd30_autoCal_get = bool_to_string(airSensor.getAutoSelfCalibration());
+  Serial.println("    scd30_autoCal_get = " + scd30_autoCal_get);
 
   HTTPClient http;
 
   String sendURL;
-  String scd30_autoCal;
-
-  sendURL = URL_SCD30_autoCal_get;
+  sendURL = URL_SCD30_autoCal;
   http.begin(sendURL);
   http.GET();
-  scd30_autoCal = http.getString();
+
+  String scd30_autoCal = http.getString();
+  
   http.end();
 
-  if (debug) {
-    Serial.println("    scd30_autoCal = " + scd30_autoCal);
-  }
+  if (debug) {Serial.println("    scd30_autoCal = " + scd30_autoCal);}
 
-  if (scd30_autoCalHistory != scd30_autoCal) {
+  if (scd30_autoCal_get != scd30_autoCal) {
     if (scd30_autoCal == "true") {
 
       airSensor.setAutoSelfCalibration(true);
-      if (debug) {
-        Serial.println("    Enable SCD30 AutoCalibration");
-      }
+      if (debug) {Serial.println("    Enable SCD30 AutoCalibration");}
     }
     else {
       airSensor.setAutoSelfCalibration(false);
-      if (debug) {
-        Serial.println("    Disable SCD30 AutoCalibration");
-      }
+      if (debug) {Serial.println("    Disable SCD30 AutoCalibration");}
     }
-
     airSensor.reset();
-    scd30_autoCalHistory = scd30_autoCal;
   }
 }
 
@@ -793,6 +797,286 @@ void SCD30_serial_output() {
 }
 #endif
 
+#ifdef SPS30_active
+//######################################### SPS30 functions ########################################################
+
+void SPS30_setup() {
+
+  int16_t ret;
+  uint8_t auto_clean_days = 4;
+  uint32_t auto_clean;
+
+  sensirion_i2c_init();
+
+   while (sps30_probe() != 0) {
+    Serial.println("SPS sensor probing failed");
+    send_ErrorLog("Error: SPS30 sensor probing failed");
+    delay(1000);
+  }
+
+  ret = sps30_set_fan_auto_cleaning_interval_days(auto_clean_days);
+  if (ret) {
+    Serial.println("error setting the auto-clean interval: " + String(ret));
+    send_ErrorLog("Error: SPS30 setting the auto-clean interval failed");
+  }
+
+  #ifdef SPS30_LIMITED_I2C_BUFFER_SIZE
+    Serial.println("Your Arduino hardware has a limitation that only allows reading the mass concentrations.");
+    Serial.println("For more information, please check:");
+    Serial.println("https://github.com/Sensirion/arduino-sps#esp8266-partial-legacy-support");
+    send_ErrorLog("Warning: SPS30 Your Arduino hardware has a limitation that only allows reading the mass concentrations.");
+    delay(2000);
+  #endif
+
+  SPS30_activated = true;
+
+}
+
+void SPS30_start_fan() {
+
+  int16_t ret;
+  
+  Serial.println("starting measurement...");
+  
+  ret = sps30_start_measurement(); //start measurement
+  if (ret < 0) {
+    Serial.println("error starting measurement");
+    sps30_stop_measurement();
+    send_ErrorLog("Error: SPS30 error starting measurement (fan)");
+    reboot_on_error();
+  }
+}
+
+void SPS30_get_data() {
+
+  struct sps30_measurement m;
+  char serial[SPS30_MAX_SERIAL_LEN];
+  uint16_t data_ready;
+  int16_t ret;
+
+  do {
+    ret = sps30_read_data_ready(&data_ready);
+
+    if (ret < 0) {
+      Serial.println("error reading data-ready flag: " + String(ret));
+      sps30_stop_measurement();
+      send_ErrorLog("Error: SPS30 error reading data-ready flag");
+      break;
+    } 
+    else if (!data_ready)
+    {
+      Serial.println("data not ready, no new measurement available");
+      send_ErrorLog("Error: SPS30 data not ready, no new measurement available");
+      break;
+    } 
+    else
+    {
+      break;
+    }
+     
+    delay(100); /* retry in 100ms */
+  } while (1);
+
+  ret = sps30_read_measurement(&m);
+
+  if (ret < 0) {
+    Serial.println("error reading measurement");
+    sps30_stop_measurement();
+    send_ErrorLog("Error: SPS30 error reading measurement");
+    reboot_on_error();
+  } 
+  else {
+    Serial.println("stopping measurement...");
+    ret = sps30_stop_measurement();
+    if (ret < 0) {
+      Serial.println("error stopping measurement");
+      send_ErrorLog("Error: SPS30 error stopping measurement");
+      reboot_on_error();
+    }
+  }
+
+  // convert 
+
+  char m_char[7];
+  String untrimmed;
+
+  dtostrf(m.mc_1p0, 6, 2, m_char);
+  mc_1p0 = String(m_char);
+  mc_1p0.trim();
+  
+  dtostrf(m.mc_2p5, 6, 2, m_char);
+  mc_2p5 = String(m_char);
+  mc_2p5.trim();
+  
+  dtostrf(m.mc_4p0, 6, 2, m_char);
+  mc_4p0 = String(m_char);
+  mc_4p0.trim();
+  
+  dtostrf(m.mc_10p0, 6, 2,m_char); 
+  mc_10p0 = String(m_char);
+  mc_10p0.trim();
+
+  dtostrf(m.nc_0p5, 6, 2, m_char);
+  nc_0p5 = String(m_char);
+  nc_0p5.trim();
+
+  dtostrf(m.nc_1p0, 6, 2, m_char);
+  nc_1p0 = String(m_char);
+  nc_1p0.trim();
+
+  dtostrf(m.nc_2p5, 6, 2, m_char);
+  nc_2p5 = String(m_char);
+  nc_2p5.trim();
+
+  dtostrf(m.nc_4p0, 6, 2, m_char);
+  nc_4p0 = String(m_char);
+  nc_4p0.trim();
+
+  dtostrf(m.nc_10p0, 6, 2, m_char);    
+  nc_10p0 = String(m_char);
+  nc_10p0.trim();
+
+  dtostrf(m.typical_particle_size, 6, 2, m_char);
+  typical_particle_size = String(m_char);
+  typical_particle_size.trim();
+}
+
+void SPS30_zero_data() {
+
+  mc_1p0 = "0";
+  mc_2p5 = "0";
+  mc_4p0 = "0";
+  mc_10p0 = "0";
+  nc_0p5 = "0";
+  nc_1p0 = "0";
+  nc_2p5 = "0";
+  nc_4p0 = "0";
+  nc_10p0 = "0";
+  typical_particle_size = "0";
+  
+}
+
+void SPS30_serial_output() {
+
+String output;
+
+  if (SPS30_sensor_active) {
+
+    output = String("SPS30 -- "); 
+    output += "mc_1p0 = " + mc_1p0;
+    output += ", mc_2p5 = " + mc_2p5;
+    output += ", mc_4p0 = " + mc_4p0;
+    output += ", mc_10p0 = " + mc_10p0;
+    output += ", nc_0p5 = " + nc_0p5;
+    output += ", nc_1p0 = " + nc_1p0;
+    output += ", nc_2p5 = " + nc_2p5;
+    output += ", nc_4p0 = " + nc_4p0;
+    output += ", nc_10p0 = " + nc_10p0;
+    output += ", tps = " + typical_particle_size;    
+  }
+  else {output = String("SPS30 -- inactive");}
+ 
+  Serial.println(output);
+}
+
+void SPS30_control_heater() {
+
+  if (debug) {Serial.println("### SPS30_control_heater");}
+
+  HTTPClient http;
+  
+  int humi_int = humi.toInt();
+  String send_url;
+
+  //------------------------------------ Test mode
+
+  if (humi_test > 0) {
+    humi_int = humi_test;
+  }
+  
+  // -----------------------------------------
+
+  if (debug) {
+      Serial.print("    Humidity/high/low: " + String(humi_int) + "/" + String(humi_high) + "/" + String(humi_low));
+  }
+
+  if (humi_int >= humi_high) {
+    if (debug) {
+      Serial.print(" -- Activate heater");
+      Serial.println(" -- Switch GPIO to low: " + String(Relay_A));
+    }
+    digitalWrite(Relay_A, LOW);
+    send_url = URL_heater + "true";
+  }
+  else if (humi_int < humi_high && humi_int > humi_low) {
+    if (debug) {Serial.println(" -- Do nothing");}
+  }
+  else if (humi_int <= humi_low) {
+    if (debug) {
+      Serial.print(" -- Deactivate heater (low)");
+      Serial.println(" -- Switch GPIO to high: " + String(Relay_A));
+    }
+    digitalWrite(Relay_A, HIGH);
+    send_url = URL_heater + "false";
+  }
+  else {
+    if (debug) {
+      Serial.print(" -- Out of range - deactivate heater");
+      Serial.println(" -- Switch GPIO to high: " + String(Relay_A));
+    }
+    digitalWrite(Relay_A, HIGH);
+    send_url = URL_heater + "false";
+    send_ErrorLog("Warning: SPS30_control_heater out of range Humidity/high/low: " + String(humi_int) + "/" + String(humi_high) + "/" + String(humi_low));
+  }
+  http.begin(send_url);
+  http.GET();
+  http.end();  
+}
+
+void SPS30_get_heater_config() {
+
+  HTTPClient http;
+
+  http.begin(URL_humi_low);
+  http.GET();
+  humi_low = http.getString().toInt();  
+
+  http.begin(URL_humi_high);
+  http.GET();
+  humi_high = http.getString().toInt();  
+
+  http.begin(URL_humi_test);
+  http.GET();
+  humi_test = http.getString().toInt();  
+
+  http.end();
+}
+
+void SPS30_get_dynamic_config() {
+
+  if (debug) {Serial.println("### SPS30_get_dynamic_config");}
+
+  HTTPClient http;
+
+  // Get SPS30_sensor_active
+
+  http.begin(URL_SPS30_sensor_active);
+  http.GET();
+  if (http.getString() == "true") {
+    SPS30_sensor_active = true;
+  }
+  else {
+    SPS30_sensor_active = false;
+  }
+
+  if (debug) {
+    Serial.println("    New SPS30_sensor_active setting = " + bool_to_string(SPS30_sensor_active));  
+  }
+  http.end();
+}
+
+#endif
+
 #ifdef WindSensor_active
 //######################################### wind speed sensor section #######################################################
 
@@ -804,19 +1088,145 @@ void WindSensor_get_config() {
   
   HTTPClient http;
 
-  http.begin( URL_A0_Step_Vmax);
+  http.begin( URL_A0_Step_Voltage);
   http.GET();
 
   httpResult = http.getString();
-  WindSensor_A0_Step_Vmax =  httpResult.toDouble();
-  if (debug) {Serial.println("    A0_Step_Vmax = " + String(WindSensor_A0_Step_Vmax, 9));}
+  WindSensor_A0_Step_Voltage =  httpResult.toDouble();
+  if (debug) {Serial.println("    A0_Step_Vmax = " + String(WindSensor_A0_Step_Voltage, 9));}
      
   http.end();
 }
 
-void WindSensor_get_Data() {
+void WindSpeed_get_data() {
+
+  if (debug) {Serial.println("### WindSpeed_get_data");}
 
   int Analog_Input = analogRead(analog_Pin);
-  WindSensor_Speed = Analog_Input * WindSensor_A0_Step_Vmax * 3.6;
+  WindSensor_Speed = Analog_Input * WindSensor_A0_Step_Voltage * 3.6;
+
+ if (debug) {Serial.println("    Analog_Input = " + String(Analog_Input));}
+ if (debug) {Serial.println("    WindSensor_Speed = " + String(WindSensor_Speed));}
+}
+
+void WindDirection_setup() {
+
+  pinMode(RTS, OUTPUT);
+  digitalWrite(RTS, LOW);
+  RS485.begin(BAUD_RATE, SWSERIAL_8N1, RX, TX, false, 128, 128);
+
+  WindSensor_Direction_activated = true;
+  
+}
+
+uint16_t Modbus_calc_crc(byte buf[], int len) {
+
+  // calculates the CRC for a modbus frame. Important: the last two bytes are ignored (expect CRC here)
+  
+  uint16_t crc = 0xFFFF;
+
+  for (int pos = 0; pos < (len - 2); pos++) {  
+    crc ^= (uint16_t)buf[pos];          // XOR byte into least sig. byte of crc
+
+    for (int i = 8; i != 0; i--) {    // Loop over each bit
+      if ((crc & 0x0001) != 0) {      // If the LSB is set
+        crc >>= 1;                    // Shift right and XOR 0xA001
+        crc ^= 0xA001;
+      }
+      else                            // Else LSB is not set
+        crc >>= 1;                    // Just shift right
+    }
+  }
+  // Note, this number has low and high bytes swapped, so use it accordingly (or swap bytes)
+  return crc;
+}
+
+String WindDirection_get_name(uint16_t wind_direction) {
+
+  switch (wind_direction) {
+   case 22: return "NNO";
+   case 45: return "NO"; 
+   case 67: return "ONO";
+   case 90: return "O";
+   case 112: return "OSO";
+   case 135: return "SO";
+   case 157: return "SSO";
+   case 180: return "S";
+   case 202: return "SSW";
+   case 225: return "SW";
+   case 247: return "WSW";
+   case 270: return "W";
+   case 292: return "WNW";
+   case 315: return "NW";
+   case 337: return "NNW";
+   case 360: return "N";
+  }
+}
+
+void WindDirection_get_data() {
+
+  if (debug) {Serial.println("### WindDirection_get_data");}
+
+  byte modbus_buf[9];
+  byte modbus_request[] = {0x01, 0x03, 0x00, 0x00, 0x00, 0x02, 0xC4, 0x0B};
+
+  /*uint16_t CRC = Calc_ModRTU_CRC(Anemometer_request, 8);
+  uint8_t CRC_MSB = CRC >> 8;
+  uint8_t CRC_LSB = CRC;
+  String CRC_Output = hex_to_string(CRC_LSB) + " " + hex_to_string(CRC_MSB);
+  Serial.println("CRC: " + CRC_Output);*/
+
+  if (debug) {
+    Serial.print("    Write: ");
+    digitalWrite(RTS, HIGH);     // init Transmit
+    Serial.print(RS485.write(modbus_request, 8));
+    Serial.print("\n");
+  }
+
+  if (debug) {Serial.println("    Read: ");}
+  
+  digitalWrite(RTS, LOW);      // init Receive
+  int x = 10;
+  if (debug) {Serial.print("    Wait for data ");}
+  while (!RS485.available() && x > 0) {
+  
+      if (debug) {Serial.print(x - 1);}
+      delay(100);
+      x--;
+  }
+
+  if (x > 0) {
+    
+    RS485.readBytes(modbus_buf, 9);
+
+    if (debug) {
+      Serial.print("    Buffer : ");
+      for ( byte i = 0; i < 9; i++ ) {
+        Serial.print(hex_to_string(modbus_buf[i]));
+        Serial.print(" ");
+      }
+      Serial.print("\n");
+    
+      WindSensor_Direction = ((uint16_t)modbus_buf[3] << 8) | modbus_buf[4];
+      WindSensor_Direction_Str = WindDirection_get_name(WindSensor_Direction);
+    }
+  }
+  else {
+    if (debug) {Serial.println(" - no data");}
+    WindSensor_Direction = 0;
+    WindSensor_Direction_Str = "n/a";
+  }
+}  
+
+void WindSensor_serial_output() {
+
+  String output;
+
+  output = "WindSensor -- "; 
+  output += "WindSpeed = " + String(WindSensor_Speed);
+  output += ", WindDirection = " + WindSensor_Direction_Str;
+  output += " (" + String(WindSensor_Direction) + ")";
+ 
+  Serial.println(output);
 }
 #endif
