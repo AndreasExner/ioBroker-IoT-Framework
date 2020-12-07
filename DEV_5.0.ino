@@ -2,8 +2,8 @@
 
   DEV Template for iobroker IoT Framework
 
-  Version: F5_5.0
-  Date: 2020-12-01
+  Version: F5_5.2.0
+  Date: 2020-12-06
 
   This sketch is based on my ioBroker IoT Framework V5
   https://github.com/AndreasExner/ioBroker-IoT-Framework
@@ -41,6 +41,7 @@
 //#define BME280_active
 //#define BME680_active
 //#define SCD30_active
+//#define SPS30_active
 //#define WindSensor_active
 
 //+++++++++++++++++++++++++++++++++++++++++ generic device section +++++++++++++++++++++++++++++++++++++++++++++++++
