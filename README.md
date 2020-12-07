@@ -13,28 +13,46 @@ With the **5th generation** of the Framework was completely restructured because
 Be sure to have this file in the same folder like the primary .ino file. Opening the primary .ino file in Arduino editor should loaded  the extension automatically.
 
 
-**Released projects**
+
+#### **Released projects**
+
 - [Highly precise indoor air sensor (HTP, CO2 and IAQ)](https://github.com/AndreasExner/ioBroker-IoT-IndoorAirSensor)
-- Outdoor partical matter sensor (to be documented)
+- [Outdoor partical matter sensor](https://github.com/AndreasExner/ioBroker-IoT-PM_AQI-Sensor) (to be documented)
 - Highly precise weather monitoring (HTP and rain) (to be documented)
-- Wind speed and direction monitoring (to be finished soon)
+- [Wind speed and direction monitoring](https://github.com/AndreasExner/iobroker-IoT-WindSensor)
 - Water tank monitoring (to be revised in spring CY21)
 - Garden sprinkler valve and soil moisture monitoring (to be revised in spring CY21)
 
-## Supported sensors
-
-- BME280 (based on the [Arduino Library for BME280 sensors](https://github.com/adafruit/Adafruit_BME280_Library))
-- BME680 (based on the [BoschSensortec Arduino library for BSEC](https://github.com/BoschSensortec/BSEC-Arduino-library))
-- SCD30 (based on the [SparkFun SCD30 Arduino Library](https://github.com/sparkfun/SparkFun_SCD30_Arduino_Library))
-- WindSensor (Analog Input)
 
 
 ## History
 
-Version: 5.0 (release) 2020-12-02
+**5.2.0: sensor update**
+
+- added SPS30
+- added Wind speed and direction sensor (including software serial)
+- minor bugfixes and improvements
+
+**5.0.0: initial V5 release**
 
 
-#### Tested environment
+
+## Supported sensors
+
+- BME280 (based on the [Adafruit_BME280_Library version 2.1.2 ](https://github.com/adafruit/Adafruit_BME280_Library))
+- BME680 (based on the [BoschSensortec Arduino library for BSEC 1.6.1480](https://github.com/BoschSensortec/BSEC-Arduino-library))
+- SCD30 (based on the [SparkFun SCD30 Arduino library release 9](https://github.com/sparkfun/SparkFun_SCD30_Arduino_Library))
+- SPS30 (based on the [Sensirion embedded SPS library 3.1.0](https://github.com/Sensirion/embedded-sps))
+- WindSensor
+  - Software Serial ([based on the EspSoftwareSerial library 6.10.0](https://github.com/plerup/espsoftwareserial))
+
+**Important:**
+
+The Bosch BSEC library uses precompiled libraries. See the appendix for some changes to the ESP8266 plattform.txt file.
+
+
+
+## Tested environment
 
 - Software
   - Arduino IDE 1.8.13 (Windows)
@@ -42,11 +60,17 @@ Version: 5.0 (release) 2020-12-02
   - Adafruit_BME280_Library version 2.1.2
   - BSEC-Arduino-library 1.6.1480
   - SparkFun_SCD30_Arduino_Library release 9
+  - Sensirion embedded SPS library 3.1.0
+  - ESPSoftwareSerial library 6.10.0
 - Hardware
   - NodeMCU Lolin V3 (ESP8266MOD 12-F)
+  - NodeMCU D1 Mini (ESP8266MOD 12-F)
   - GY-BME280
   - CJMCU-680 BME680
   - Sensirion SCD30
+  - Sensirion SPS30
+  - 5 V MAX485 / RS485 Modul TTL to RS-485 MCU
+
 
 
 ## Prerequisites
@@ -238,3 +262,48 @@ Depending on the requirements and the used sensors, the loop can be look complet
 - **`02`** Send date to iobroker, run sensor setup (if required)
 - **`03`** Optional, serial output counter
 - **`04`** Can be used for "real time" task that must run more frequently then in the 1 Hz loop (not implemented in this example)
+
+
+
+## Appendix
+
+#### BME680 / BSEC
+
+The Bosch BSEC library uses precompiled libraries. You need to make some changes to the ESP8266 plattform.txt file to allow and include precompiled libraries:
+
+1. find the plattform.txt file for your hardware package. The default path on a Windows PC should be for example: 
+
+   ```
+   C:\Users\<username>\AppData\Local\Arduino15\packages\esp8266\hardware\esp8266\2.7.4
+   ```
+
+   
+
+2. Add the line "compiler.libraries.ldflags=" (block starts at line #82):
+
+   ```c++
+   # These can be overridden in platform.local.txt
+   compiler.c.extra_flags=
+   compiler.c.elf.extra_flags=
+   compiler.S.extra_flags=
+   compiler.cpp.extra_flags=
+   compiler.ar.extra_flags=
+   compiler.objcopy.eep.extra_flags=
+   compiler.elf2hex.extra_flags=
+   #### added for BSEC
+   compiler.libraries.ldflags=
+   ```
+
+   
+
+3. Change the line "Combine gc-sections, archives, and objects" (starts at line #113) and add "{compiler.libraries.ldflags}" directive at the suggested position:
+
+   ```
+   ## Combine gc-sections, archives, and objects
+   # recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} -Wl,--end-group  "-L{build.path}"
+   #### changed for BSEC
+   recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} {compiler.libraries.ldflags} -Wl,--end-group  "-L{build.path}"
+   
+   ```
+
+   
