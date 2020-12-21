@@ -10,7 +10,7 @@ With the **5th generation** of the Framework was completely restructured because
 
 **Important:**
 
-Be sure to have this file in the same folder like the primary .ino file. Opening the primary .ino file in Arduino editor should loaded  the extension automatically.
+Be sure to have this file in the same folder like the primary .ino file. Opening the primary .ino file in Arduino editor should load  the extension automatically.
 
 
 
