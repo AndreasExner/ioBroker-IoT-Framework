@@ -4,7 +4,7 @@
 
 Working with IoT sensors and actors in ioBroker often needs a lot of development and testing. Every improvement needs a staging environment as well to keep the productive data untouched. I’ve started to setup a more or less universal dev environment for IoT devices like NodeMCU or Arduino. It enables a convenient and easy way to switch between dev and prod without uploading a new image to the device. 
 
-With the **3rd generation** of the Framework I stared to include modules for hardware sensors like the BME280 to make them reusable in further projects.
+With the **3rd generation** of the Framework I started to include modules for hardware sensors like the BME280 to make them reusable in further projects.
 
 With the **5th generation** of the Framework was completely restructured because the long code became more and more unhandy. All generic and hardware specific sensors functions are moved the extension file AEX_iobroker_IoT_Framework.ino. 
 
