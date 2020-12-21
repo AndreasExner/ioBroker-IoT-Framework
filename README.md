@@ -23,9 +23,26 @@ Be sure to have this file in the same folder like the primary .ino file. Opening
 - Water tank monitoring (to be revised in spring CY21)
 - Garden sprinkler valve and soil moisture monitoring (to be revised in spring CY21)
 
+#### Auxiliary projects
+
+- [RS485-UART-EchoTest](https://github.com/AndreasExner/RS485-UART-EchoTest)
+
+
+
+## Important: Serial output
+
+  If your sketch use wind direction sensor (or RS485 in general), you **have** to change the  serial output for debug and runtime information (Serial.print and Serial.println) to **serial1**. 
+
 
 
 ## History
+
+**5.3.2: UART Update**
+
+- Major improvements and bugfixes for the UART communication: CRC check, remove zero bytes etc.
+- Softwareserial replaced with hardware serial
+- changed wind speed data transfer (for de-noising)
+- minor fixes and improvements
 
 **5.2.0: sensor update**
 
@@ -44,7 +61,6 @@ Be sure to have this file in the same folder like the primary .ino file. Opening
 - SCD30 (based on the [SparkFun SCD30 Arduino library release 9](https://github.com/sparkfun/SparkFun_SCD30_Arduino_Library))
 - SPS30 (based on the [Sensirion embedded SPS library 3.1.0](https://github.com/Sensirion/embedded-sps))
 - WindSensor
-  - Software Serial ([based on the EspSoftwareSerial library 6.10.0](https://github.com/plerup/espsoftwareserial))
 
 **Important:**
 
@@ -70,6 +86,7 @@ The Bosch BSEC library uses precompiled libraries. See the appendix for some cha
   - Sensirion SCD30
   - Sensirion SPS30
   - 5 V MAX485 / RS485 Modul TTL to RS-485 MCU
+  - FT232 UART to USB Adapter
 
 
 
@@ -204,6 +221,13 @@ The default path for the devices root folder is: **`0_userdata.0.IoT-Devices`**.
     http://192.168.1.240:8087/set/0_userdata.0.IoT.Weather.
     ```
 
+These datapoints are for output only:
+
+- **`ErrorLog`** Last info/error message from the device
+- **`MAC`** HW wifi mac address of the device
+- **`RSSI`** Last wifi RSSI information from the device
+- **`Reset`** Depricated
+
 
 
 #### Specific device configuration and data
@@ -216,6 +240,48 @@ Depending on the **`DevMode`**, the device reads config and writes data into dif
 It is recommended to keep the datapoints in both sections identical to avoid errors when changing the **`DevMode`**. The values can be different. In the basic template only one datapoint is mandatory:
 
 - **`Interval`** Defines the delay between two data transmissions / measurements. Also see generic device section.
+
+These datapoints are for output only:
+
+- **`SensorID`** Sensor device ID
+
+
+
+##### Sensor specific datapoints
+
+The full documentation can be found in the particular project on github. 
+
+
+
+Indoor Air Sensor - input:
+
+- **`BME680_reset`** [false] Triggers a reset (EraseEEPROM) of the BME680 sensor when true. Flips back to false when the reset was done 
+- **`SCD30_autoCal`** [true] Enables the SCD30 ASC
+- **`ePaperDisplay_active`** [false] Enables the ePaper display. Do not set to true unless a display is attached
+- **`LastUpdate`** LastUpdate string for the ePaper display
+
+Indoor Air Sensor - output:
+
+- **`BME680_eraseEEPROM`** Timestamp for the last eraseEEPROM event
+- **`BME680_loadState`** Timestamp for the last loadState event
+- **`BME680_updateStatet`** Timestamp for the last updateState event
+- **`SensorID`** Sensor device ID
+- **`temp, humi, airp`** Temperature in °C, humidity in % and ambient air pressure in mbar (BME280)
+- **`iaqS, iaqD`** IAQ index static, IAQ index dynamic (BME680)
+- **`iaSA, iaDA`** IAQ accuracy static, IAQ accuracy dynamic (BME680)
+- **`VOCe`** VOC equivalent, in mg/m³ (BME680)
+- **`co2`** CO2 concentration in ppm (SCD30)
+
+Wind Sensor - input:
+
+- **`A0_Step_Voltage`** The voltage per step of the A/D converter for the  windspeed sensor. Due to the line resistance it might be necessary to adjust these values individually. A good point to start is 0.03 V.
+
+Wind Sensor - output:
+
+- **`WindDirectionArray`** Array of wind direction values
+- **`WindSpeedArray`** Array of wind speed values
+- **`crcErrors`** CRC errors during the last interval
+- **`rxTimeOuts`** RX timeouts (missed frames) during the last interval
 
 
 
@@ -305,5 +371,3 @@ The Bosch BSEC library uses precompiled libraries. You need to make some changes
    recipe.c.combine.pattern="{compiler.path}{compiler.c.elf.cmd}" {build.exception_flags} -Wl,-Map "-Wl,{build.path}/{build.project_name}.map" {compiler.c.elf.flags} {compiler.c.elf.extra_flags} -o "{build.path}/{build.project_name}.elf" -Wl,--start-group {object_files} "{archive_file_path}" {compiler.c.elf.libs} {compiler.libraries.ldflags} -Wl,--end-group  "-L{build.path}"
    
    ```
-
-   
