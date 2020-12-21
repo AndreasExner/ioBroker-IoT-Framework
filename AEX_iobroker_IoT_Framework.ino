@@ -20,7 +20,7 @@
   IMPORTANT:
 
   If your sketch use wind direction sensor (RS485), you HAVE to change the 
-  serial output for debug and runtime information (Serial.print) to serial1. 
+  serial output for debug and runtime information (Serial.print) to **serial1**. 
 
   
   MIT License
@@ -51,41 +51,41 @@
 
 void connect_wifi() {
 
-  Serial1.println("### connect_wifi");
+  Serial.println("### connect_wifi");
 
   WiFi.begin(ssid, password);
-  Serial1.print("    Connecting to ");
-  Serial1.print(ssid); Serial1.println(" ...");
+  Serial.print("    Connecting to ");
+  Serial.print(ssid); Serial.println(" ...");
 
   digitalWrite(LED, HIGH);
 
   int i = 0;
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
-    Serial1.print(++i); Serial1.print(' ');
+    Serial.print(++i); Serial.print(' ');
     if (i > 20) {
-      Serial1.println("    Connection failed!");
+      Serial.println("    Connection failed!");
       reboot_on_error();
     }
   }
 
-  Serial1.println('\n');
-  Serial1.println("    Connection established!");
-  Serial1.print("    IP address:\t");
-  Serial1.println(WiFi.localIP());
+  Serial.println('\n');
+  Serial.println("    Connection established!");
+  Serial.print("    IP address:\t");
+  Serial.println(WiFi.localIP());
 }
 
 void get_wifi_state() {
 
   if (debug) {
-    Serial1.println("### get_wifi_state");
+    Serial.println("### get_wifi_state");
   }
 
   if (WiFi.status() == WL_CONNECTED) {
 
     String wifiRSSI = String(WiFi.RSSI());
     if (debug) {
-      Serial1.println("    Wifi RSSI: " +  wifiRSSI);
+      Serial.println("    Wifi RSSI: " +  wifiRSSI);
     }
 
     HTTPClient http;
@@ -97,15 +97,15 @@ void get_wifi_state() {
     http.end();
   }
   else {
-    Serial1.println("    Wifi not connected, try reconnect");
+    Serial.println("    Wifi not connected, try reconnect");
     connect_wifi();
   }
 }
 
 void reboot_on_error() {
 
-  Serial1.println('\n');
-  Serial1.println("Performing reboot in 30 seconds....");
+  Serial.println('\n');
+  Serial.println("Performing reboot in 30 seconds....");
 
   int i = 0;
   while (i < 30) {
@@ -117,7 +117,7 @@ void reboot_on_error() {
     delay(100);
     digitalWrite(LED, LOW);
     delay(600);
-    Serial1.print(++i); Serial1.print(' ');
+    Serial.print(++i); Serial.print(' ');
   }
 
   HWReset();
@@ -126,7 +126,7 @@ void reboot_on_error() {
 void send_ErrorLog(String Error_Msg) {
 
   if (debug) {
-    Serial1.println("### send_ErrorLog");
+    Serial.println("### send_ErrorLog");
   }
 
   HTTPClient http;
@@ -139,22 +139,22 @@ void send_ErrorLog(String Error_Msg) {
   http.end();
 
   if (debug) {
-    Serial1.println("    Send ErrorLog: " + Error_Msg);
+    Serial.println("    Send ErrorLog: " + Error_Msg);
   }
 }
 
 void get_interval() {
 
-  if (debug) {Serial1.println("### get_interval");}
+  if (debug) {Serial.println("### get_interval");}
 
   HTTPClient http;
 
-  //if (debug) {Serial1.println("    Get Interval URL_INT = " + URL_INT);}
+  //if (debug) {Serial.println("    Get Interval URL_INT = " + URL_INT);}
   http.begin(URL_INT);
   http.GET();
 
   interval = http.getString().toInt();
-  if (debug) {Serial1.println("    New Interval = " + String(interval));}
+  if (debug) {Serial.println("    New Interval = " + String(interval));}
 
   http.end();
 }
@@ -162,14 +162,14 @@ void get_interval() {
 void get_dynamic_config() {
 
   if (debug) {
-    Serial1.println("### get_dynamic_config");
+    Serial.println("### get_dynamic_config");
   }
 
   HTTPClient http;
 
   // get LED setting
 
-  //if (debug) {Serial1.println("   Get LED setting URL_LED = " + URL_LED);}
+  //if (debug) {Serial.println("   Get LED setting URL_LED = " + URL_LED);}
   http.begin(URL_LED);
   http.GET();
   if (http.getString() == "true") {
@@ -180,12 +180,12 @@ void get_dynamic_config() {
   }
 
   if (debug) {
-    Serial1.println("    New LED setting = " + bool_to_string(led));
+    Serial.println("    New LED setting = " + bool_to_string(led));
   }
 
   // get SensorActive
 
-  //if (debug) {Serial1.println("    Get LED SensorActive URL_sensor_active = " + URL_sensor_active);}
+  //if (debug) {Serial.println("    Get LED SensorActive URL_sensor_active = " + URL_sensor_active);}
   http.begin(URL_sensor_active);
   http.GET();
 
@@ -197,17 +197,17 @@ void get_dynamic_config() {
   }
 
   if (debug) {
-    Serial1.println("    New Sensor Active State = " + bool_to_string(sensor_active));
+    Serial.println("    New Sensor Active State = " + bool_to_string(sensor_active));
   }
 
   // get DevMode
 
-  //if (debug) {Serial1.println("    Get DevMode URL_DevMode = " + URL_DevMode);}
+  //if (debug) {Serial.println("    Get DevMode URL_DevMode = " + URL_DevMode);}
   http.begin(URL_DevMode);
   int httpcode = http.GET();
 
   if (httpcode != 200) {
-    Serial1.println("    Error getting DevMode -> switch to DevMode = true");
+    Serial.println("    Error getting DevMode -> switch to DevMode = true");
     DevMode = true;
   }
   else {
@@ -220,7 +220,7 @@ void get_dynamic_config() {
   }
 
   if (debug) {
-    Serial1.println("    DevMode = " + bool_to_string(DevMode));
+    Serial.println("    DevMode = " + bool_to_string(DevMode));
   }
 
   /*
@@ -237,7 +237,7 @@ void get_dynamic_config() {
       baseURL_DATA_GET = http.getString();
     }
     else {
-      Serial1.println("    Error getting baseURL_DATA_GET");
+      Serial.println("    Error getting baseURL_DATA_GET");
     }
 
     http.begin(baseURL_DEVICE_GET + "baseURL_SET_DEV");
@@ -246,7 +246,7 @@ void get_dynamic_config() {
       baseURL_DATA_SET = http.getString();
     }
     else {
-      Serial1.println("    Error getting baseURL_DATA_SET");
+      Serial.println("    Error getting baseURL_DATA_SET");
     }
   }
   else {
@@ -257,7 +257,7 @@ void get_dynamic_config() {
       baseURL_DATA_GET = http.getString();
     }
     else {
-      Serial1.println("    Error getting baseURL_DATA_GET");
+      Serial.println("    Error getting baseURL_DATA_GET");
     }
 
     http.begin(baseURL_DEVICE_GET + "baseURL_SET_PROD");
@@ -266,7 +266,7 @@ void get_dynamic_config() {
       baseURL_DATA_SET = http.getString();
     }
     else {
-      Serial1.println("    Error getting baseURL_DATA_SET");
+      Serial.println("    Error getting baseURL_DATA_SET");
     }
   }
 
@@ -274,15 +274,15 @@ void get_dynamic_config() {
   baseURL_DATA_SET.replace("\"", "");
 
   if (debug) {
-    Serial1.println("    baseURL_DATA_GET = " + baseURL_DATA_GET);
-    Serial1.println("    baseURL_DATA_SET = " + baseURL_DATA_SET);
+    Serial.println("    baseURL_DATA_GET = " + baseURL_DATA_GET);
+    Serial.println("    baseURL_DATA_SET = " + baseURL_DATA_SET);
   }
 }
 
 void send_ip() {
 
   if (debug) {
-    Serial1.println("### send_ip");
+    Serial.println("### send_ip");
   }
 
   HTTPClient http;
@@ -294,7 +294,7 @@ void send_ip() {
   http.end();
 
   if (debug) {
-    Serial1.println("    Local IP: " + WiFi.localIP().toString());
+    Serial.println("    Local IP: " + WiFi.localIP().toString());
   }
 }
 
@@ -303,10 +303,10 @@ void send_sid() {
   byte mac[6];
 
   if (debug) {
-    Serial1.println("### send_sid");
+    Serial.println("### send_sid");
   }
   if (debug) {
-    Serial1.println("    SensorID = " + SensorID);
+    Serial.println("    SensorID = " + SensorID);
   }
 
   HTTPClient http;
@@ -324,7 +324,7 @@ void send_sid() {
   WifimacAddress += String(mac[0], HEX);
 
   if (debug) {
-    Serial1.println("    Wifi MAC: " +  WifimacAddress);
+    Serial.println("    Wifi MAC: " +  WifimacAddress);
   }
 
   String sendURL = URL_MAC + WifimacAddress;
@@ -337,7 +337,7 @@ void send_sid() {
 void send_rst() {
 
   if (debug) {
-    Serial1.println("### send_rst");
+    Serial.println("### send_rst");
   }
 
   HTTPClient http;
@@ -389,7 +389,7 @@ void ePaper_setup() {
 
 void ePaper_get_LastUpdate() {
 
-  if (debug) {Serial1.println("### get_ePaper_LastUpdate");}
+  if (debug) {Serial.println("### get_ePaper_LastUpdate");}
 
   HTTPClient http;
 
@@ -401,12 +401,12 @@ void ePaper_get_LastUpdate() {
   LastUpdate.remove(0,1);
   LastUpdate.remove(LastUpdate.length() - 1, 1);
 
-  if (debug) {Serial1.println("    LastUpdate = " + LastUpdate);}
+  if (debug) {Serial.println("    LastUpdate = " + LastUpdate);}
 }
 
 void ePaper_get_dynamic_config() {
 
-  if (debug) {Serial1.println("### ePaper_get_dynamic_config");}
+  if (debug) {Serial.println("### ePaper_get_dynamic_config");}
 
   HTTPClient http;
 
@@ -422,7 +422,7 @@ void ePaper_get_dynamic_config() {
   }
 
   if (debug) {
-    Serial1.println("    New SePaperDisplay_active setting = " + bool_to_string(ePaperDisplay_active));  
+    Serial.println("    New SePaperDisplay_active setting = " + bool_to_string(ePaperDisplay_active));  
   }
   http.end();
 }
@@ -472,7 +472,7 @@ void ePaper_showData_1_54_3fields(String field1_name, String field2_name, String
 void BME280_setup() {
 
   if (debug) {
-    Serial1.println("### BME280_setup");
+    Serial.println("### BME280_setup");
   }
 
   bme.begin(0x76);
@@ -491,7 +491,7 @@ void BME280_setup() {
 void BME280_get_data() {
 
   if (debug) {
-    Serial1.println("### BME280_get_data");
+    Serial.println("### BME280_get_data");
   }
 
   bme280_humi = String(bme.readHumidity());
@@ -504,7 +504,7 @@ void BME280_get_data() {
 void BME280_get_sealevel_pressure() {
 
   if (debug) {
-    Serial1.println("### BME280_get_sealevel_pressure");
+    Serial.println("### BME280_get_sealevel_pressure");
   }
 
   HTTPClient http;
@@ -516,9 +516,9 @@ void BME280_get_sealevel_pressure() {
   pressure_sl = http.getString().toInt();
 
   if (debug) {
-    Serial1.print("    Pressure at sea level = ");
-    Serial1.print(pressure_sl);
-    Serial1.print("\n");
+    Serial.print("    Pressure at sea level = ");
+    Serial.print(pressure_sl);
+    Serial.print("\n");
   }
 }
 
@@ -530,7 +530,7 @@ void BME280_serial_output() {
   output += ", bme280_airp=" + bme280_airp;
   //output += ", bme280_alti=" + bme280_alti;
 
-  Serial1.println(output);
+  Serial.println(output);
 }
 #endif
 
@@ -540,7 +540,7 @@ void BME280_serial_output() {
 void BME680_setup() {
 
   if (debug) {
-    Serial1.println("### BME680_setup");
+    Serial.println("### BME680_setup");
   }
 
   String output;
@@ -550,7 +550,7 @@ void BME680_setup() {
 
   iaqSensor.begin(BME680_I2C_ADDR_SECONDARY, Wire);
   output = "    BSEC library version " + String(iaqSensor.version.major) + "." + String(iaqSensor.version.minor) + "." + String(iaqSensor.version.major_bugfix) + "." + String(iaqSensor.version.minor_bugfix);
-  Serial1.println(output);
+  Serial.println(output);
   BME680_checkIaqSensorStatus();
 
   iaqSensor.setConfig(bsec_config_iaq);
@@ -579,12 +579,12 @@ void BME680_checkIaqSensorStatus() {
   if (iaqSensor.status != BSEC_OK) {
     if (iaqSensor.status < BSEC_OK) {
       output = "    BSEC error code : " + String(iaqSensor.status);
-      Serial1.println(output);
+      Serial.println(output);
       send_ErrorLog("Error: BME680 " + output);
       reboot_on_error();
     } else {
       output = "    BSEC warning code : " + String(iaqSensor.status);
-      Serial1.println(output);
+      Serial.println(output);
       send_ErrorLog("Warning: BME680 " + output);
     }
   }
@@ -592,12 +592,12 @@ void BME680_checkIaqSensorStatus() {
   if (iaqSensor.bme680Status != BME680_OK) {
     if (iaqSensor.bme680Status < BME680_OK) {
       output = "    BME680 error code : " + String(iaqSensor.bme680Status);
-      Serial1.println(output);
+      Serial.println(output);
       send_ErrorLog("Error: BME680 " + output);
       reboot_on_error();
     } else {
       output = "    BME680 warning code : " + String(iaqSensor.bme680Status);
-      Serial1.println(output);
+      Serial.println(output);
       send_ErrorLog("Warning: BME680 " + output);
     }
   }
@@ -607,21 +607,21 @@ void BME680_checkIaqSensorStatus() {
 void BME680_loadState() {
 
   if (debug) {
-    Serial1.println("### BME680_loadState");
+    Serial.println("### BME680_loadState");
   }
 
   if (EEPROM.read(0) == BSEC_MAX_STATE_BLOB_SIZE) {
     // Existing state in EEPROM
-    Serial1.println("    Reading state from EEPROM: ");
+    Serial.println("    Reading state from EEPROM: ");
 
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE; i++) {
       bsecState[i] = EEPROM.read(i + 1);
       if (debug) {
-        Serial1.print(bsecState[i], HEX);
+        Serial.print(bsecState[i], HEX);
       }
     }
     if (debug) {
-      Serial1.print("\n");
+      Serial.print("\n");
     }
 
     iaqSensor.setState(bsecState);
@@ -635,7 +635,7 @@ void BME680_loadState() {
 
   } else {
     // Erase the EEPROM with zeroes
-    Serial1.println("    Erasing EEPROM");
+    Serial.println("    Erasing EEPROM");
 
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE + 1; i++)
       EEPROM.write(i, 0);
@@ -653,7 +653,7 @@ void BME680_loadState() {
 void BME680_updateState() {
 
   if (debug) {
-    Serial1.println("### BME680_updateState");
+    Serial.println("### BME680_updateState");
   }
 
   bool update = false;
@@ -679,16 +679,16 @@ void BME680_updateState() {
     iaqSensor.getState(bsecState);
     BME680_checkIaqSensorStatus();
 
-    Serial1.println("    Writing state to EEPROM");
+    Serial.println("    Writing state to EEPROM");
 
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE ; i++) {
       EEPROM.write(i + 1, bsecState[i]);
       if (debug) {
-        Serial1.print(bsecState[i], HEX);
+        Serial.print(bsecState[i], HEX);
       }
     }
     if (debug) {
-      Serial1.print("\n");
+      Serial.print("\n");
     }
 
     EEPROM.write(0, BSEC_MAX_STATE_BLOB_SIZE);
@@ -705,7 +705,7 @@ void BME680_updateState() {
 void BME680_get_data() {
 
   if (debug) {
-    Serial1.println("### BME680_get_data");
+    Serial.println("### BME680_get_data");
   }
 
   iaqD = String(iaqSensor.iaq);
@@ -729,7 +729,7 @@ void BME680_get_data() {
 void BME680_reset() {
 
   if (debug) {
-    Serial1.println("### BME680_reset");
+    Serial.println("### BME680_reset");
   }
 
   HTTPClient http;
@@ -744,7 +744,7 @@ void BME680_reset() {
 
   if (debug) {
     if (debug) {
-      Serial1.println("    Reset: " + result);
+      Serial.println("    Reset: " + result);
     }
   }
 
@@ -752,7 +752,7 @@ void BME680_reset() {
 
     // Erase the EEPROM with zeroes
     if (debug) {
-      Serial1.println("    Erasing EEPROM");
+      Serial.println("    Erasing EEPROM");
     }
 
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE + 1; i++)
@@ -782,7 +782,7 @@ void BME680_serial_output() {
   output += ", Temp=" + temp;
   output += ", Humi=" + humi;
 
-  Serial1.println(output);
+  Serial.println(output);
 }
 #endif
 
@@ -792,7 +792,7 @@ void BME680_serial_output() {
 void SCD30_setup() {
 
   if (debug) {
-    Serial1.println("### SCD30_setup");
+    Serial.println("### SCD30_setup");
   }
 
   Wire.begin();
@@ -800,14 +800,14 @@ void SCD30_setup() {
   if (airSensor.begin(Wire) == false) {
 
     if (debug) {
-      Serial1.println("    Air sensor not detected. Please check wiring");
+      Serial.println("    Air sensor not detected. Please check wiring");
     }
     send_ErrorLog("Error: SCD30 Air sensor not detected. Please check wiring");
     reboot_on_error();
   }
   else {
     if (debug) {
-      Serial1.println("     Air sensor found.");
+      Serial.println("     Air sensor found.");
     }
   }
 
@@ -822,7 +822,7 @@ void SCD30_setup() {
 void SCD30_get_data() {
 
   if (debug) {
-    Serial1.println("### SCD30_get_data");
+    Serial.println("### SCD30_get_data");
   }
 
   // collect SCD30 data
@@ -834,11 +834,11 @@ void SCD30_get_data() {
     scd30_humi = String(airSensor.getHumidity());
   }
   else {
-    Serial1.println("    SCD30 no data");
+    Serial.println("    SCD30 no data");
   }
 
   if (debug) {
-    Serial1.println("    Ambient pressure = " + String(bme280_pressure));
+    Serial.println("    Ambient pressure = " + String(bme280_pressure));
   }
   airSensor.setAmbientPressure(bme280_pressure); // update ambient pressure preset from BME280
 
@@ -846,10 +846,10 @@ void SCD30_get_data() {
 
 void SCD30_AutoCal() {
 
-  if (debug) {Serial1.println("### SCD30_AutoCal");}
+  if (debug) {Serial.println("### SCD30_AutoCal");}
 
   String scd30_autoCal_get = bool_to_string(airSensor.getAutoSelfCalibration());
-  if (debug) {Serial1.println("    scd30_autoCal_get = " + scd30_autoCal_get);}
+  if (debug) {Serial.println("    scd30_autoCal_get = " + scd30_autoCal_get);}
 
   HTTPClient http;
 
@@ -862,17 +862,17 @@ void SCD30_AutoCal() {
   
   http.end();
 
-  if (debug) {Serial1.println("    scd30_autoCal = " + scd30_autoCal);}
+  if (debug) {Serial.println("    scd30_autoCal = " + scd30_autoCal);}
 
   if (scd30_autoCal_get != scd30_autoCal) {
     if (scd30_autoCal == "true") {
 
       airSensor.setAutoSelfCalibration(true);
-      if (debug) {Serial1.println("    Enable SCD30 AutoCalibration");}
+      if (debug) {Serial.println("    Enable SCD30 AutoCalibration");}
     }
     else {
       airSensor.setAutoSelfCalibration(false);
-      if (debug) {Serial1.println("    Disable SCD30 AutoCalibration");}
+      if (debug) {Serial.println("    Disable SCD30 AutoCalibration");}
     }
     airSensor.reset();
   }
@@ -885,7 +885,7 @@ void SCD30_serial_output() {
   output += ", temp=" + scd30_temp;
   output += ", humi=" + scd30_humi;
 
-  Serial1.println(output);
+  Serial.println(output);
 }
 #endif
 
@@ -901,21 +901,21 @@ void SPS30_setup() {
   sensirion_i2c_init();
 
    while (sps30_probe() != 0) {
-    Serial1.println("SPS sensor probing failed");
+    Serial.println("SPS sensor probing failed");
     send_ErrorLog("Error: SPS30 sensor probing failed");
     delay(1000);
   }
 
   ret = sps30_set_fan_auto_cleaning_interval_days(auto_clean_days);
   if (ret) {
-    Serial1.println("error setting the auto-clean interval: " + String(ret));
+    Serial.println("error setting the auto-clean interval: " + String(ret));
     send_ErrorLog("Error: SPS30 setting the auto-clean interval failed");
   }
 
   #ifdef SPS30_LIMITED_I2C_BUFFER_SIZE
-    Serial1.println("Your Arduino hardware has a limitation that only allows reading the mass concentrations.");
-    Serial1.println("For more information, please check:");
-    Serial1.println("https://github.com/Sensirion/arduino-sps#esp8266-partial-legacy-support");
+    Serial.println("Your Arduino hardware has a limitation that only allows reading the mass concentrations.");
+    Serial.println("For more information, please check:");
+    Serial.println("https://github.com/Sensirion/arduino-sps#esp8266-partial-legacy-support");
     send_ErrorLog("Warning: SPS30 Your Arduino hardware has a limitation that only allows reading the mass concentrations.");
     delay(2000);
   #endif
@@ -928,11 +928,11 @@ void SPS30_start_fan() {
 
   int16_t ret;
   
-  Serial1.println("starting measurement...");
+  Serial.println("starting measurement...");
   
   ret = sps30_start_measurement(); //start measurement
   if (ret < 0) {
-    Serial1.println("error starting measurement");
+    Serial.println("error starting measurement");
     sps30_stop_measurement();
     send_ErrorLog("Error: SPS30 error starting measurement (fan)");
     reboot_on_error();
@@ -950,14 +950,14 @@ void SPS30_get_data() {
     ret = sps30_read_data_ready(&data_ready);
 
     if (ret < 0) {
-      Serial1.println("error reading data-ready flag: " + String(ret));
+      Serial.println("error reading data-ready flag: " + String(ret));
       sps30_stop_measurement();
       send_ErrorLog("Error: SPS30 error reading data-ready flag");
       break;
     } 
     else if (!data_ready)
     {
-      Serial1.println("data not ready, no new measurement available");
+      Serial.println("data not ready, no new measurement available");
       send_ErrorLog("Error: SPS30 data not ready, no new measurement available");
       break;
     } 
@@ -972,16 +972,16 @@ void SPS30_get_data() {
   ret = sps30_read_measurement(&m);
 
   if (ret < 0) {
-    Serial1.println("error reading measurement");
+    Serial.println("error reading measurement");
     sps30_stop_measurement();
     send_ErrorLog("Error: SPS30 error reading measurement");
     reboot_on_error();
   } 
   else {
-    Serial1.println("stopping measurement...");
+    Serial.println("stopping measurement...");
     ret = sps30_stop_measurement();
     if (ret < 0) {
-      Serial1.println("error stopping measurement");
+      Serial.println("error stopping measurement");
       send_ErrorLog("Error: SPS30 error stopping measurement");
       reboot_on_error();
     }
@@ -1068,12 +1068,12 @@ String output;
   }
   else {output = String("SPS30 -- inactive");}
  
-  Serial1.println(output);
+  Serial.println(output);
 }
 
 void SPS30_control_heater() {
 
-  if (debug) {Serial1.println("### SPS30_control_heater");}
+  if (debug) {Serial.println("### SPS30_control_heater");}
 
   HTTPClient http;
   
@@ -1089,32 +1089,32 @@ void SPS30_control_heater() {
   // -----------------------------------------
 
   if (debug) {
-      Serial1.print("    Humidity/high/low: " + String(humi_int) + "/" + String(humi_high) + "/" + String(humi_low));
+      Serial.print("    Humidity/high/low: " + String(humi_int) + "/" + String(humi_high) + "/" + String(humi_low));
   }
 
   if (humi_int >= humi_high) {
     if (debug) {
-      Serial1.print(" -- Activate heater");
-      Serial1.println(" -- Switch GPIO to low: " + String(Relay_A));
+      Serial.print(" -- Activate heater");
+      Serial.println(" -- Switch GPIO to low: " + String(Relay_A));
     }
     digitalWrite(Relay_A, LOW);
     send_url = URL_heater + "true";
   }
   else if (humi_int < humi_high && humi_int > humi_low) {
-    if (debug) {Serial1.println(" -- Do nothing");}
+    if (debug) {Serial.println(" -- Do nothing");}
   }
   else if (humi_int <= humi_low) {
     if (debug) {
-      Serial1.print(" -- Deactivate heater (low)");
-      Serial1.println(" -- Switch GPIO to high: " + String(Relay_A));
+      Serial.print(" -- Deactivate heater (low)");
+      Serial.println(" -- Switch GPIO to high: " + String(Relay_A));
     }
     digitalWrite(Relay_A, HIGH);
     send_url = URL_heater + "false";
   }
   else {
     if (debug) {
-      Serial1.print(" -- Out of range - deactivate heater");
-      Serial1.println(" -- Switch GPIO to high: " + String(Relay_A));
+      Serial.print(" -- Out of range - deactivate heater");
+      Serial.println(" -- Switch GPIO to high: " + String(Relay_A));
     }
     digitalWrite(Relay_A, HIGH);
     send_url = URL_heater + "false";
@@ -1146,7 +1146,7 @@ void SPS30_get_heater_config() {
 
 void SPS30_get_dynamic_config() {
 
-  if (debug) {Serial1.println("### SPS30_get_dynamic_config");}
+  if (debug) {Serial.println("### SPS30_get_dynamic_config");}
 
   HTTPClient http;
 
@@ -1162,7 +1162,7 @@ void SPS30_get_dynamic_config() {
   }
 
   if (debug) {
-    Serial1.println("    New SPS30_sensor_active setting = " + bool_to_string(SPS30_sensor_active));  
+    Serial.println("    New SPS30_sensor_active setting = " + bool_to_string(SPS30_sensor_active));  
   }
   http.end();
 }
@@ -1174,7 +1174,7 @@ void SPS30_get_dynamic_config() {
 
 void WindSensor_get_config() {
 
-  if (debug) {Serial1.println("### WindSensor_get_data");}
+  if (debug) {Serial.println("### WindSensor_get_data");}
 
   String httpResult;
   
@@ -1185,14 +1185,14 @@ void WindSensor_get_config() {
 
   httpResult = http.getString();
   WindSensor_A0_Step_Voltage =  httpResult.toDouble();
-  if (debug) {Serial1.println("    A0_Step_Vmax = " + String(WindSensor_A0_Step_Voltage, 9));}
+  if (debug) {Serial.println("    A0_Step_Vmax = " + String(WindSensor_A0_Step_Voltage, 9));}
      
   http.end();
 }
 
 void WindSpeed_get_data() {
 
-  if (debug) {Serial1.println("### WindSpeed_get_data");}
+  if (debug) {Serial.println("### WindSpeed_get_data");}
 
   int Analog_Input = analogRead(analog_Pin);
   double WindSensor_Speed = Analog_Input * WindSensor_A0_Step_Voltage * 3.6;
@@ -1200,8 +1200,8 @@ void WindSpeed_get_data() {
   int x = interval - counter;
   WindSpeedArray[x] = WindSensor_Speed;
 
-  if (debug) {Serial1.println("    Analog_Input = " + String(Analog_Input));}
-  if (debug) {Serial1.println("    WindSpeedArray[" + String(x) + "] = " + String(WindSpeedArray[x]));}
+  if (debug) {Serial.println("    Analog_Input = " + String(Analog_Input));}
+  if (debug) {Serial.println("    WindSpeedArray[" + String(x) + "] = " + String(WindSpeedArray[x]));}
    
 }
 
@@ -1249,13 +1249,13 @@ bool CRC_Check(byte buf[], int len) {
 
 void WindDirection_get_data() {
 
-  if (debug) {Serial1.println("### WindDirection_get_data");}
+  if (debug) {Serial.println("### WindDirection_get_data");}
   
   int readBufferSize;
 
 // ..... send request to sensor
   
-  if (debug) {Serial1.print("    Write: ");}
+  if (debug) {Serial.print("    Write: ");}
   
   digitalWrite(RTS, HIGH);     // init Transmit
   int write_length = Serial.write(request_buffer, request_buffer_length);
@@ -1266,25 +1266,25 @@ void WindDirection_get_data() {
   digitalWrite(RTS, LOW);
 
   if (debug) {
-    Serial1.print(write_length);
-    Serial1.println(" byte");
+    Serial.print(write_length);
+    Serial.println(" byte");
   }
    
 // ..... read answer
 
-  if (debug) {Serial1.print("    Read: ");}
+  if (debug) {Serial.print("    Read: ");}
   
   int x = 5;
-  if (debug) {Serial1.print("    Wait for data ");} //max 500ms
+  if (debug) {Serial.print("    Wait for data ");} //max 500ms
   while (x > 0) {
   
       readBufferSize = Serial.available();
       if (readBufferSize >= expectedFrameSize) {break;}
-      if (debug) {Serial1.print(x - 1);}
+      if (debug) {Serial.print(x - 1);}
       delay(100);
       x--;
   }
-  if (debug) {Serial1.println(" ");}  
+  if (debug) {Serial.println(" ");}  
 
 // ..... proceed whe buffer is big enogh to expect a full frame
 
@@ -1295,13 +1295,13 @@ void WindDirection_get_data() {
     Serial.readBytes(readBuffer, readBufferSize);
     
     if (debug) {
-      Serial1.println("RX Buffer Size: " + String(readBufferSize));
-      Serial1.print("RX Buffer : ");
+      Serial.println("RX Buffer Size: " + String(readBufferSize));
+      Serial.print("RX Buffer : ");
       for (int i = 0; i < readBufferSize; i++ ) {
-        Serial1.print(hex_to_string(readBuffer[i]));
-        Serial1.print(" ");
+        Serial.print(hex_to_string(readBuffer[i]));
+        Serial.print(" ");
       }
-      Serial1.println("end");
+      Serial.println("end");
     }
 
 // ..... trim leading zeros (errors) from frame
@@ -1314,13 +1314,13 @@ void WindDirection_get_data() {
     }
 
     if (debug) {
-      Serial1.println("Trimmed frame size: " + String(readBufferSize));
-      Serial1.print("Frame : ");
+      Serial.println("Trimmed frame size: " + String(readBufferSize));
+      Serial.print("Frame : ");
         for ( byte i = 0; i < readBufferSize; i++ ) {
-          Serial1.print(hex_to_string(readBuffer[i]));
-          Serial1.print(" ");
+          Serial.print(hex_to_string(readBuffer[i]));
+          Serial.print(" ");
         }
-        Serial1.println("end");
+        Serial.println("end");
     }
 
 // ..... proceed whe buffer is still big enogh to expect a full frame
@@ -1335,7 +1335,7 @@ void WindDirection_get_data() {
       }
       else {
         
-        if (debug){Serial1.println("    RX CRC ERROR");}
+        if (debug){Serial.println("    RX CRC ERROR");}
         crcErrors++;
       }
     }
@@ -1344,12 +1344,12 @@ void WindDirection_get_data() {
     
     else {
       rxTimeOuts++;
-      if (debug){Serial1.println("    TIMEOUT");}
+      if (debug){Serial.println("    TIMEOUT");}
     }
   }
   else {
     rxTimeOuts++;
-    if (debug){Serial1.println("    TIMEOUT");}
+    if (debug){Serial.println("    TIMEOUT");}
   }
   
   
@@ -1357,7 +1357,7 @@ void WindDirection_get_data() {
   
   int a = interval - counter;
   WindDirectionArray[a] = WindSensor_Direction;
-  if (debug) {Serial1.println("    WindDirectionArray[" + String(a) + "] = " + String(WindDirectionArray[a]));}
+  if (debug) {Serial.println("    WindDirectionArray[" + String(a) + "] = " + String(WindDirectionArray[a]));}
 }  
 
 void WindSensor_serial_output() {
@@ -1369,6 +1369,6 @@ void WindSensor_serial_output() {
   output += "WindSpeed = " + String(WindSpeedArray[x]);
   output += ", WindDirection = " + String(WindDirectionArray[x]);
  
-  Serial1.println(output);
+  Serial.println(output);
 }
 #endif
