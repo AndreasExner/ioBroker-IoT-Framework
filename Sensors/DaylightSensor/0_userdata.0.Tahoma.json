@@ -1,0 +1,157 @@
+{
+  "0_userdata.0.Tahoma.SunBlindsAutoSouth": {
+    "_id": "0_userdata.0.Tahoma.SunBlindsAutoSouth",
+    "type": "state",
+    "common": {
+      "name": "SunBlindsAutoSouth",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true,
+      "def": false
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1622445536476,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.Tahoma.SunBlindsAutoWest": {
+    "_id": "0_userdata.0.Tahoma.SunBlindsAutoWest",
+    "type": "state",
+    "common": {
+      "name": "SunBlindsAutoWest",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true,
+      "desc": "Sonnenschutz West Automatik Aktiv"
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1619953148355,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.Tahoma.SunLightIndexSouth": {
+    "_id": "0_userdata.0.Tahoma.SunLightIndexSouth",
+    "type": "state",
+    "common": {
+      "name": "SunLightIndexSouth",
+      "role": "",
+      "type": "number",
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": true,
+          "debounce": "1000",
+          "retention": "1209600",
+          "changesRelogInterval": "90",
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1622445359168,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.Tahoma.SunLightIndexWest": {
+    "_id": "0_userdata.0.Tahoma.SunLightIndexWest",
+    "type": "state",
+    "common": {
+      "name": "SunLightIndexWest",
+      "role": "",
+      "type": "number",
+      "read": true,
+      "write": true,
+      "desc": "Sunlight Index West",
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": true,
+          "debounce": "1000",
+          "retention": "1209600",
+          "changesRelogInterval": "90",
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1619951176674,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.Tahoma.SunLightLevelSouth": {
+    "_id": "0_userdata.0.Tahoma.SunLightLevelSouth",
+    "type": "state",
+    "common": {
+      "name": "SunLightLevelSouth",
+      "role": "",
+      "type": "number",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1622445408042,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  },
+  "0_userdata.0.Tahoma.SunLightLevelWest": {
+    "_id": "0_userdata.0.Tahoma.SunLightLevelWest",
+    "type": "state",
+    "common": {
+      "name": "SunLightLevelWest",
+      "role": "",
+      "type": "number",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1622444918892,
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    }
+  }
+}

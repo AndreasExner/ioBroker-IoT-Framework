@@ -1,0 +1,285 @@
+{
+  "0_userdata.0.IoT-Devices.08.ErrorLog": {
+    "_id": "0_userdata.0.IoT-Devices.08.ErrorLog",
+    "type": "state",
+    "common": {
+      "name": "ErrorLog",
+      "role": "",
+      "type": "string",
+      "desc": "Error Log",
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": false,
+          "debounce": 0,
+          "maxLength": 10,
+          "retention": "31536000",
+          "changesRelogInterval": "60",
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    },
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1606833009926
+  },
+  "0_userdata.0.IoT-Devices.08.MAC": {
+    "_id": "0_userdata.0.IoT-Devices.08.MAC",
+    "type": "state",
+    "common": {
+      "name": "MAC",
+      "role": "",
+      "type": "string",
+      "desc": "Device MAC address",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1606833009967
+  },
+  "0_userdata.0.IoT-Devices.08.RSSI": {
+    "_id": "0_userdata.0.IoT-Devices.08.RSSI",
+    "type": "state",
+    "common": {
+      "name": "RSSI",
+      "role": "",
+      "type": "number",
+      "desc": "Last Wifi RSSI",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    },
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1606833009987
+  },
+  "0_userdata.0.IoT-Devices.08.Reset": {
+    "_id": "0_userdata.0.IoT-Devices.08.Reset",
+    "type": "state",
+    "common": {
+      "name": "LastReset",
+      "role": "",
+      "type": "string",
+      "desc": "Last reset timestamp",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    },
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1606833010006
+  },
+  "0_userdata.0.IoT-Devices.08.DeviceName": {
+    "_id": "0_userdata.0.IoT-Devices.08.DeviceName",
+    "type": "state",
+    "common": {
+      "name": "DeviceName",
+      "role": "",
+      "type": "string",
+      "desc": "Device name",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    },
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1606833010069
+  },
+  "0_userdata.0.IoT-Devices.08.DeviceIP": {
+    "_id": "0_userdata.0.IoT-Devices.08.DeviceIP",
+    "type": "state",
+    "common": {
+      "name": "DeviceIP",
+      "role": "",
+      "type": "string",
+      "desc": "Device IP address",
+      "read": true,
+      "write": true
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.simpleapi",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    },
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1606833010049
+  },
+  "0_userdata.0.IoT-Devices.08.Config.Debug": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.Debug",
+    "type": "state",
+    "common": {
+      "name": "Debug",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true,
+      "desc": "Debug (serial output) on / off",
+      "def": false
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625469440784,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.IoT-Devices.08.Config.Delay": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.Delay",
+    "type": "state",
+    "common": {
+      "name": "Delay",
+      "role": "",
+      "type": "number",
+      "read": true,
+      "write": true,
+      "desc": "Loop delay",
+      "unit": "ms"
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625469459486,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.IoT-Devices.08.Config.DevMode": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.DevMode",
+    "type": "state",
+    "common": {
+      "name": "DevMode",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true,
+      "desc": "DevMode on/off",
+      "def": false
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625469476169,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.IoT-Devices.08.Config.DeviceActive": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.DeviceActive",
+    "type": "state",
+    "common": {
+      "name": "DeviceActive",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true,
+      "desc": "Activate all sensors",
+      "def": false
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625469568162,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.IoT-Devices.08.Config.Interval": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.Interval",
+    "type": "state",
+    "common": {
+      "name": "Interval",
+      "role": "",
+      "type": "number",
+      "read": true,
+      "write": true,
+      "desc": "Send data every x loops"
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625469610476,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  },
+  "0_userdata.0.IoT-Devices.08.Config.LED": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.LED",
+    "type": "state",
+    "common": {
+      "name": "LED",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true,
+      "desc": "Blink LED on / off",
+      "def": false
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625469694674,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  }
+}
