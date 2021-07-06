@@ -1,0 +1,25 @@
+{
+  "0_userdata.0.IoT.DevTemplate.DeviceID": {
+    "_id": "0_userdata.0.IoT.DevTemplate.DeviceID",
+    "type": "state",
+    "common": {
+      "name": "DeviceID",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true,
+      "desc": "DeviceID",
+      "def": ""
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625589569205,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 {
-  "0_userdata.0.IoT-Devices.DEV.ErrorLog": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.ErrorLog",
+  "0_userdata.0.IoT-Devices.08.ErrorLog": {
+    "_id": "0_userdata.0.IoT-Devices.08.ErrorLog",
     "type": "state",
     "common": {
       "name": "ErrorLog",
@@ -35,8 +35,8 @@
     "user": "system.user.admin",
     "ts": 1606833009926
   },
-  "0_userdata.0.IoT-Devices.DEV.MAC": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.MAC",
+  "0_userdata.0.IoT-Devices.08.MAC": {
+    "_id": "0_userdata.0.IoT-Devices.08.MAC",
     "type": "state",
     "common": {
       "name": "MAC",
@@ -57,8 +57,8 @@
     "user": "system.user.admin",
     "ts": 1606833009967
   },
-  "0_userdata.0.IoT-Devices.DEV.RSSI": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.RSSI",
+  "0_userdata.0.IoT-Devices.08.RSSI": {
+    "_id": "0_userdata.0.IoT-Devices.08.RSSI",
     "type": "state",
     "common": {
       "name": "RSSI",
@@ -79,8 +79,8 @@
     "user": "system.user.admin",
     "ts": 1606833009987
   },
-  "0_userdata.0.IoT-Devices.DEV.Reset": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.Reset",
+  "0_userdata.0.IoT-Devices.08.Reset": {
+    "_id": "0_userdata.0.IoT-Devices.08.Reset",
     "type": "state",
     "common": {
       "name": "LastReset",
@@ -101,8 +101,8 @@
     "user": "system.user.admin",
     "ts": 1606833010006
   },
-  "0_userdata.0.IoT-Devices.DEV.DeviceName": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.DeviceName",
+  "0_userdata.0.IoT-Devices.08.DeviceName": {
+    "_id": "0_userdata.0.IoT-Devices.08.DeviceName",
     "type": "state",
     "common": {
       "name": "DeviceName",
@@ -123,8 +123,8 @@
     "user": "system.user.admin",
     "ts": 1606833010069
   },
-  "0_userdata.0.IoT-Devices.DEV.DeviceIP": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.DeviceIP",
+  "0_userdata.0.IoT-Devices.08.DeviceIP": {
+    "_id": "0_userdata.0.IoT-Devices.08.DeviceIP",
     "type": "state",
     "common": {
       "name": "DeviceIP",
@@ -145,8 +145,8 @@
     "user": "system.user.admin",
     "ts": 1606833010049
   },
-  "0_userdata.0.IoT-Devices.DEV.Config.Debug": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.Config.Debug",
+  "0_userdata.0.IoT-Devices.08.Config.Debug": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.Debug",
     "type": "state",
     "common": {
       "name": "Debug",
@@ -168,8 +168,8 @@
       "ownerGroup": "system.group.administrator"
     }
   },
-  "0_userdata.0.IoT-Devices.DEV.Config.Delay": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.Config.Delay",
+  "0_userdata.0.IoT-Devices.08.Config.Delay": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.Delay",
     "type": "state",
     "common": {
       "name": "Delay",
@@ -191,8 +191,8 @@
       "ownerGroup": "system.group.administrator"
     }
   },
-  "0_userdata.0.IoT-Devices.DEV.Config.DevMode": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.Config.DevMode",
+  "0_userdata.0.IoT-Devices.08.Config.DevMode": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.DevMode",
     "type": "state",
     "common": {
       "name": "DevMode",
@@ -214,8 +214,8 @@
       "ownerGroup": "system.group.administrator"
     }
   },
-  "0_userdata.0.IoT-Devices.DEV.Config.DeviceActive": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.Config.DeviceActive",
+  "0_userdata.0.IoT-Devices.08.Config.DeviceActive": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.DeviceActive",
     "type": "state",
     "common": {
       "name": "DeviceActive",
@@ -237,8 +237,8 @@
       "ownerGroup": "system.group.administrator"
     }
   },
-  "0_userdata.0.IoT-Devices.DEV.Config.Interval": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.Config.Interval",
+  "0_userdata.0.IoT-Devices.08.Config.Interval": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.Interval",
     "type": "state",
     "common": {
       "name": "Interval",
@@ -259,8 +259,8 @@
       "ownerGroup": "system.group.administrator"
     }
   },
-  "0_userdata.0.IoT-Devices.DEV.Config.LED": {
-    "_id": "0_userdata.0.IoT-Devices.DEV.Config.LED",
+  "0_userdata.0.IoT-Devices.08.Config.LED": {
+    "_id": "0_userdata.0.IoT-Devices.08.Config.LED",
     "type": "state",
     "common": {
       "name": "LED",

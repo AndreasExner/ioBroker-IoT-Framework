@@ -1,0 +1,95 @@
+{
+  "0_userdata.0.IoT.DaylightSensor.DayLight01": {
+    "_id": "0_userdata.0.IoT.DaylightSensor.DayLight01",
+    "type": "state",
+    "common": {
+      "name": "Daylight01 (south)",
+      "role": "",
+      "type": "number",
+      "desc": "Manuell erzeugt",
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": true,
+          "debounce": "1000",
+          "retention": "1209600",
+          "changesRelogInterval": "90",
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    },
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1622391170534
+  },
+  "0_userdata.0.IoT.DaylightSensor.DayLight02": {
+    "_id": "0_userdata.0.IoT.DaylightSensor.DayLight02",
+    "type": "state",
+    "common": {
+      "name": "Daylight02 (west)",
+      "role": "",
+      "type": "number",
+      "desc": "Manuell erzeugt",
+      "read": true,
+      "write": true,
+      "custom": {
+        "sql.0": {
+          "enabled": true,
+          "changesOnly": true,
+          "debounce": "1000",
+          "retention": "1209600",
+          "changesRelogInterval": "90",
+          "changesMinDelta": 0,
+          "storageType": "",
+          "aliasId": "",
+          "counter": false
+        }
+      }
+    },
+    "native": {},
+    "acl": {
+      "object": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator",
+      "state": 1636
+    },
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1622391170565
+  },
+  "0_userdata.0.IoT.DaylightSensor.DeviceID": {
+    "_id": "0_userdata.0.IoT.DaylightSensor.DeviceID",
+    "type": "state",
+    "common": {
+      "name": "DeviceID",
+      "role": "",
+      "type": "string",
+      "read": true,
+      "write": true,
+      "desc": "Manuell erzeugt",
+      "def": ""
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625495972900,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  }
+}

@@ -2,25 +2,27 @@
 
   Shared functions for iobroker IoT Framework
 
-  Version: V5.3.2
-  Date: 2020-12-21
+  Version: V6.0.0
+  Date: 2021-07-06
 
   Supported features / sensors:
 
-  - Wifi/HTTP Client (no tls)
+  - Wifi
+  - MQTT (NEW in 6.0)
   - BME280
   - BME680
   - SCD30
-  - SPS30
-  - WindSensor
-  - ePaper Displays
+  - SPS30 WARNING the SPS30 section is not yet converted to MQTT! Please use the latest version of F5!
+  - WindSensor WARNING the WindSensor section is not yet converted to MQTT! Please use the latest version of F5!
+  - ePaper Displays (code for IndoorAirSensor)
+  - ADS1115 (code for DaylightSensor)
 
   https://github.com/AndreasExner/ioBroker-IoT-Framework
 
   IMPORTANT:
 
   If your sketch use wind direction sensor (RS485), you HAVE to change the 
-  serial output for debug and runtime information (Serial.print) to **serial1**. 
+  serial output for debug and runtime information (Serial.print) to serial1 ! 
 
   
   MIT License
@@ -49,12 +51,14 @@
 #ifdef AEX_iobroker_IoT_Framework
 //######################################### generic sensor functions #######################################################
 
-void connect_wifi() {
+void wifi_connect() {
 
+  #include "WiFi_secret.h"
+  
   Serial.println("### connect_wifi");
 
   WiFi.begin(ssid, password);
-  Serial.print("    Connecting to ");
+  Serial.print("    connecting to ");
   Serial.print(ssid); Serial.println(" ...");
 
   digitalWrite(LED, HIGH);
@@ -75,7 +79,7 @@ void connect_wifi() {
   Serial.println(WiFi.localIP());
 }
 
-void get_wifi_state() {
+void wifi_getState() {
 
   if (debug) {
     Serial.println("### get_wifi_state");
@@ -87,18 +91,10 @@ void get_wifi_state() {
     if (debug) {
       Serial.println("    Wifi RSSI: " +  wifiRSSI);
     }
-
-    HTTPClient http;
-
-    String sendURL = URL_RSSI + wifiRSSI;
-    http.begin(sendURL);
-    http.GET();
-
-    http.end();
   }
   else {
     Serial.println("    Wifi not connected, try reconnect");
-    connect_wifi();
+    wifi_connect();
   }
 }
 
@@ -123,235 +119,6 @@ void reboot_on_error() {
   HWReset();
 }
 
-void send_ErrorLog(String Error_Msg) {
-
-  if (debug) {
-    Serial.println("### send_ErrorLog");
-  }
-
-  HTTPClient http;
-
-  String Send_URL = URL_ErrorLog + Error_Msg;
-  Send_URL.replace(" ", "+");
-
-  http.begin(Send_URL);
-  http.GET();
-  http.end();
-
-  if (debug) {
-    Serial.println("    Send ErrorLog: " + Error_Msg);
-  }
-}
-
-void get_interval() {
-
-  if (debug) {Serial.println("### get_interval");}
-
-  HTTPClient http;
-
-  //if (debug) {Serial.println("    Get Interval URL_INT = " + URL_INT);}
-  http.begin(URL_INT);
-  http.GET();
-
-  interval = http.getString().toInt();
-  if (debug) {Serial.println("    New Interval = " + String(interval));}
-
-  http.end();
-}
-
-void get_dynamic_config() {
-
-  if (debug) {
-    Serial.println("### get_dynamic_config");
-  }
-
-  HTTPClient http;
-
-  // get LED setting
-
-  //if (debug) {Serial.println("   Get LED setting URL_LED = " + URL_LED);}
-  http.begin(URL_LED);
-  http.GET();
-  if (http.getString() == "true") {
-    led = true;
-  }
-  else {
-    led = false;
-  }
-
-  if (debug) {
-    Serial.println("    New LED setting = " + bool_to_string(led));
-  }
-
-  // get SensorActive
-
-  //if (debug) {Serial.println("    Get LED SensorActive URL_sensor_active = " + URL_sensor_active);}
-  http.begin(URL_sensor_active);
-  http.GET();
-
-  if (http.getString() == "true") {
-    sensor_active = true;
-  }
-  else {
-    sensor_active = false;
-  }
-
-  if (debug) {
-    Serial.println("    New Sensor Active State = " + bool_to_string(sensor_active));
-  }
-
-  // get DevMode
-
-  //if (debug) {Serial.println("    Get DevMode URL_DevMode = " + URL_DevMode);}
-  http.begin(URL_DevMode);
-  int httpcode = http.GET();
-
-  if (httpcode != 200) {
-    Serial.println("    Error getting DevMode -> switch to DevMode = true");
-    DevMode = true;
-  }
-  else {
-    if (http.getString() == "true") {
-      DevMode = true;
-    }
-    else {
-      DevMode = false;
-    }
-  }
-
-  if (debug) {
-    Serial.println("    DevMode = " + bool_to_string(DevMode));
-  }
-
-  /*
-     get BaseURLs based on DEV mode
-     In DEV Mode all date will be written to the dev sction in iobroker
-     otherwise productive data may be overwritten
-  */
-
-  if (DevMode == true) {
-
-    http.begin(baseURL_DEVICE_GET + "baseURL_GET_DEV");
-    httpcode = http.GET();
-    if (httpcode == 200) {
-      baseURL_DATA_GET = http.getString();
-    }
-    else {
-      Serial.println("    Error getting baseURL_DATA_GET");
-    }
-
-    http.begin(baseURL_DEVICE_GET + "baseURL_SET_DEV");
-    httpcode = http.GET();
-    if (httpcode == 200) {
-      baseURL_DATA_SET = http.getString();
-    }
-    else {
-      Serial.println("    Error getting baseURL_DATA_SET");
-    }
-  }
-  else {
-
-    http.begin(baseURL_DEVICE_GET + "baseURL_GET_PROD");
-    httpcode = http.GET();
-    if (httpcode == 200) {
-      baseURL_DATA_GET = http.getString();
-    }
-    else {
-      Serial.println("    Error getting baseURL_DATA_GET");
-    }
-
-    http.begin(baseURL_DEVICE_GET + "baseURL_SET_PROD");
-    httpcode = http.GET();
-    if (httpcode == 200) {
-      baseURL_DATA_SET = http.getString();
-    }
-    else {
-      Serial.println("    Error getting baseURL_DATA_SET");
-    }
-  }
-
-  baseURL_DATA_GET.replace("\"", "");
-  baseURL_DATA_SET.replace("\"", "");
-
-  if (debug) {
-    Serial.println("    baseURL_DATA_GET = " + baseURL_DATA_GET);
-    Serial.println("    baseURL_DATA_SET = " + baseURL_DATA_SET);
-  }
-}
-
-void send_ip() {
-
-  if (debug) {
-    Serial.println("### send_ip");
-  }
-
-  HTTPClient http;
-
-  String sendURL = URL_IP + WiFi.localIP().toString();
-
-  http.begin(sendURL);
-  http.GET();
-  http.end();
-
-  if (debug) {
-    Serial.println("    Local IP: " + WiFi.localIP().toString());
-  }
-}
-
-void send_sid() {
-
-  byte mac[6];
-
-  if (debug) {
-    Serial.println("### send_sid");
-  }
-  if (debug) {
-    Serial.println("    SensorID = " + SensorID);
-  }
-
-  HTTPClient http;
-
-  http.begin(URL_SID);
-  http.GET();
-
-  WiFi.macAddress(mac);
-
-  String WifimacAddress = String(mac[5], HEX) + ":";
-  WifimacAddress += String(mac[4], HEX) + ":";
-  WifimacAddress += String(mac[3], HEX) + ":";
-  WifimacAddress += String(mac[2], HEX) + ":";
-  WifimacAddress += String(mac[1], HEX) + ":";
-  WifimacAddress += String(mac[0], HEX);
-
-  if (debug) {
-    Serial.println("    Wifi MAC: " +  WifimacAddress);
-  }
-
-  String sendURL = URL_MAC + WifimacAddress;
-  http.begin(sendURL);
-  http.GET();
-
-  http.end();
-}
-
-void send_rst() {
-
-  if (debug) {
-    Serial.println("### send_rst");
-  }
-
-  HTTPClient http;
-
-  String sendURL = URL_RST + "true";
-
-  http.begin(sendURL);
-  http.GET();
-  http.getString();
-  http.end();
-
-  send_ErrorLog("Info: ESP8266 restart");
-}
-
 String bool_to_string(bool input) {
 
   if (input == false) {
@@ -374,61 +141,173 @@ String hex_to_string(uint8_t hex) {
   hex_string.toUpperCase();
   return ("0x" + hex_string);
 }
+
+
+//######################################### MQTT functions ########################################################
+
+void mqtt_connect() {
+  
+  #include "MQTT_secret.h"
+
+  Serial.println("### MQTT_connect");
+  Serial.println("    connecting to broker: " + String(MQTT_broker) + ":" + String(MQTT_port));
+
+  mqttClient.setUsernamePassword(MQTT_user, MQTT_pass);
+
+  int i = 0;
+  while (!mqttClient.connect(MQTT_broker, MQTT_port)) {
+    delay(1000);
+    Serial.print(++i); Serial.print(' ');
+    if (i > 20) {
+      Serial.println("    Connection failed!");
+      Serial.print("      MQTT connection failed! Error code = ");
+      Serial.println(mqttClient.connectError());
+      reboot_on_error();
+    }
+  }
+
+  Serial.println('\n');
+  Serial.println("    Connection established!");
+ 
+}
+
+void mqtt_getState() {
+
+  if (debug) {Serial.println("### MQTT_getState");}
+
+  if (mqttClient.connected() == 0) {
+  
+    if (debug) {Serial.println("    MQTT NOT connected");}
+    wifi_getState();
+    mqtt_connect();
+  }  
+  else {if (debug) {Serial.println("    MQTT connected");}}
+}
+
+void mqtt_send(String topic, String message) {
+
+  mqttClient.beginMessage(topic);
+  mqttClient.print(message);
+  mqttClient.endMessage();
+
+  if (debug) {
+    Serial.print("    topic: " + topic);
+    Serial.println(", message: " + message);
+  }
+}
+
+void mqtt_subscribeDeviceConfig() {
+
+  String subscribeConfig;
+
+  if (debug) {Serial.println("### MQTT_subscribeDeviceConfig");}
+
+  subscribeConfig = MQTT_topicDevice + "Config/#";
+  mqttClient.subscribe(subscribeConfig);
+  if (debug) {Serial.println("    subscribe topic = " + subscribeConfig);}
+
+  delay(2000); // give MQTT time to subscribe/receive. 2000ms are a good point to start.
+}
+
+void mqtt_getDeviceConfig() {
+
+  if (debug) {Serial.println("### MQTT_getDeviceConfig");}
+
+  String mqttTopic, mqttMessage;
+  int mqttMessageSize = mqttClient.parseMessage();
+  int intervalHistory = interval;
+ 
+  while (mqttMessageSize) {
+
+    mqttTopic = mqttClient.messageTopic();
+    mqttMessage = "";
+
+    while (mqttClient.available()) {
+    
+      mqttMessage += char(mqttClient.read());
+    }
+
+    if (debug) {Serial.println("    topic: " + mqttTopic + " - message: " + mqttMessage);}
+
+    if (mqttTopic == MQTT_topicDevice + "Config/LED" && mqttMessage == "true") {ledActive = true;}
+    else if (mqttTopic == MQTT_topicDevice + "Config/LED" && mqttMessage == "false") {ledActive = false;}
+    else if (mqttTopic == MQTT_topicDevice + "Config/Debug" && mqttMessage == "true") {debug = true;}
+    else if (mqttTopic == MQTT_topicDevice + "Config/Debug" && mqttMessage == "false") {debug = false;}
+    else if (mqttTopic == MQTT_topicDevice + "Config/DevMode" && mqttMessage == "true") {devMode = true;}
+    else if (mqttTopic == MQTT_topicDevice + "Config/DevMode" && mqttMessage == "false") {devMode = false;}
+    else if (mqttTopic == MQTT_topicDevice + "Config/DeviceActive" && mqttMessage == "true") {deviceActive = true;}
+    else if (mqttTopic == MQTT_topicDevice + "Config/DeviceActive" && mqttMessage == "false") {deviceActive = false;}
+    else if (mqttTopic == MQTT_topicDevice + "Config/Interval") {interval = mqttMessage.toInt();}
+    else if (mqttTopic == MQTT_topicDevice + "Config/Delay") {intervalDelay = mqttMessage.toInt();}
+    else {mqtt_parseSpecificConfig(mqttTopic, mqttMessage);} // handover sensor specific config
+    
+    mqttMessageSize = mqttClient.parseMessage();
+  }
+
+  if (debug) {Serial.println("    Interval: " + String(interval) + " - Delay: " + String(intervalDelay) + " - Debug: " + bool_to_string(debug) + " - LED: " + bool_to_string(ledActive) + " - DEV: " + bool_to_string(devMode) + " - deviceActive: " + bool_to_string(deviceActive));}
+
+  // switch to prod mode if configured in iobroker. MUST be executed after the first run of mqtt_getSensorConfig!
+  if (devMode) {MQTT_topicData = MQTT_topicDataDEV;}
+  else {MQTT_topicData = MQTT_topicDataPROD;}
+
+  if (interval != intervalHistory) {counter = 0;}
+
+}
+
+void mqtt_sendDeviceState() {
+
+  if (debug) {Serial.println("### MQTT_sendDeviceState");}
+
+  byte mac[6];
+  WiFi.macAddress(mac);
+  String WifimacAddress = String(mac[5], HEX) + ":";
+  WifimacAddress += String(mac[4], HEX) + ":";
+  WifimacAddress += String(mac[3], HEX) + ":";
+  WifimacAddress += String(mac[2], HEX) + ":";
+  WifimacAddress += String(mac[1], HEX) + ":";
+  WifimacAddress += String(mac[0], HEX);
+
+  String deviceIP = WiFi.localIP().toString();
+  String WifiRSSI = String(WiFi.RSSI());
+
+  if (debug) {
+    Serial.println("    deviceID = " + deviceID);
+    Serial.println("    deviceName = " + deviceName);
+    Serial.println("    deviceIP = " + deviceIP);
+    Serial.println("    Wifi MAC: " +  WifimacAddress);
+    Serial.println("    Wifi RSSI: " +  WifiRSSI);
+  }
+
+  mqtt_send(MQTT_topicDevice + "DeviceName", deviceName);
+  mqtt_send(MQTT_topicDevice + "DeviceIP", deviceIP);
+  mqtt_send(MQTT_topicDevice + "MAC", WifimacAddress);
+  mqtt_send(MQTT_topicDevice + "RSSI", WifiRSSI);
+  mqtt_send(MQTT_topicData + "DeviceID", deviceID);
+}
+
 #endif
 
+
 #ifdef ePaper_active
-//######################################### BME280 functions ########################################################
+//######################################### ePaper functions ########################################################
+
+// code useable for indoor air sensor only!
 
 void ePaper_setup() {
 
+  if (debug) {Serial.println("### ePaper_setup");}
+  
   display.init();
   display.eraseDisplay();
   ePaper_showData_1_54_3fields("Temperatur:", "Rel. Luftfeuchte:", "CO2 Gehalt:", "--.-- °C", "--.-- %", "---- ppm", "Stand: ----------");
-  ePaperDisplay_activated = true;
-}
+  ePaperDisplayActivated = true;
 
-void ePaper_get_LastUpdate() {
-
-  if (debug) {Serial.println("### get_ePaper_LastUpdate");}
-
-  HTTPClient http;
-
-  http.begin(URL_LastUpdate);
-  http.GET();
-  LastUpdate = http.getString();
-  http.end();
-
-  LastUpdate.remove(0,1);
-  LastUpdate.remove(LastUpdate.length() - 1, 1);
-
-  if (debug) {Serial.println("    LastUpdate = " + LastUpdate);}
-}
-
-void ePaper_get_dynamic_config() {
-
-  if (debug) {Serial.println("### ePaper_get_dynamic_config");}
-
-  HTTPClient http;
-
-  // Get ePaperDisplay_active
-
-  http.begin(URL_ePaperDisplay_active);
-  http.GET();
-  if (http.getString() == "true") {
-    ePaperDisplay_active = true;
-  }
-  else {
-    ePaperDisplay_active = false;
-  }
-
-  if (debug) {
-    Serial.println("    New SePaperDisplay_active setting = " + bool_to_string(ePaperDisplay_active));  
-  }
-  http.end();
 }
 
 void ePaper_showData_1_54_3fields(String field1_name, String field2_name, String field3_name, String field1_value, String field2_value, String field3_value, String ts_update) {
   
+  if (debug) {Serial.println("### ePaper_showData");}
+
   const GFXfont* font_b = &FreeMonoBold18pt7b;
   const GFXfont* font_a = &FreeMonoBold9pt7b;
   const GFXfont* font_c = &FreeSans9pt7b;
@@ -466,82 +345,77 @@ void ePaper_showData_1_54_3fields(String field1_name, String field2_name, String
 
 #endif
 
+
 #ifdef BME280_active
 //######################################### BME280 functions ########################################################
 
 void BME280_setup() {
 
-  if (debug) {
-    Serial.println("### BME280_setup");
-  }
+  if (debug) {Serial.println("### BME280_setup");}
 
   bme.begin(0x76);
-
   bme.setSampling(Adafruit_BME280::MODE_NORMAL,
                   Adafruit_BME280::SAMPLING_X16,  // temperature
                   Adafruit_BME280::SAMPLING_X16, // pressure
                   Adafruit_BME280::SAMPLING_X16,  // humidity
                   Adafruit_BME280::FILTER_X16,
                   Adafruit_BME280::STANDBY_MS_125 );
-
-  BME280_activated = true;
+  bme280Activated = true;
 
 }
 
-void BME280_get_data() {
+void BME280_getData() {
 
-  if (debug) {
-    Serial.println("### BME280_get_data");
-  }
+  String bme280Temp, bme280Humi, bme280Airp, bme280Alti;
+  
+  if (debug) {Serial.println("### BME280_get_data");}
 
-  bme280_humi = String(bme.readHumidity());
-  bme280_temp = String(bme.readTemperature());
-  bme280_pressure = bme.readPressure() / 100.0;
-  bme280_airp = String(bme280_pressure);
-  bme280_alti = bme.readAltitude(pressure_sl);
-}
+  bme280Humi = String(bme.readHumidity());
+  bme280Temp = String(bme.readTemperature());
+  bme280Pressure = bme.readPressure() / 100.0;
+  bme280Airp = String(bme280Pressure);
+  bme280Alti = bme.readAltitude(bme280PressureSeaLevel);
 
-void BME280_get_sealevel_pressure() {
-
-  if (debug) {
-    Serial.println("### BME280_get_sealevel_pressure");
-  }
-
-  HTTPClient http;
-
-  http.begin(URL_PRESL);  // get pressure at sea level
-  http.GET();
-  http.end();
-
-  pressure_sl = http.getString().toInt();
-
-  if (debug) {
-    Serial.print("    Pressure at sea level = ");
-    Serial.print(pressure_sl);
-    Serial.print("\n");
+  if (debug) {BME280_serialOutput(bme280Temp, bme280Humi, bme280Airp, bme280Alti);}
+  if (counter <=0) {
+    BME280_sendData(bme280Temp, bme280Humi, bme280Airp, bme280Alti);
+    
+    ePaperTemp = bme280Temp;
+    ePaperHumi = bme280Humi;
   }
 }
 
-void BME280_serial_output() {
+void BME280_serialOutput(String bme280Temp, String bme280Humi, String bme280Airp, String bme280Alti) {
 
-  String output = "BME280 -- ";
-  output += "bme280_temp=" + bme280_temp;
-  output += ", bme280_humi=" + bme280_humi;
-  output += ", bme280_airp=" + bme280_airp;
-  //output += ", bme280_alti=" + bme280_alti;
+  String output = "    BME280 -- ";
+  output += "bme280Temp=" + bme280Temp;
+  output += ", bme280Tumi=" + bme280Humi;
+  output += ", bme280Airp=" + bme280Airp;
+  output += ", bme280Alti=" + bme280Alti;
 
   Serial.println(output);
 }
+
+void BME280_sendData(String bme280Temp, String bme280Humi, String bme280Airp, String bme280Alti) {
+
+  if (debug) {Serial.println("    Send Data");}
+
+  mqtt_send(MQTT_topicData + "Temperature", bme280Temp);
+  mqtt_send(MQTT_topicData + "Humidity", bme280Humi);    
+  mqtt_send(MQTT_topicData + "Airpressure", bme280Airp);
+  mqtt_send(MQTT_topicData + "Altitude", bme280Alti);        
+  
+}
+
 #endif
+
 
 #ifdef BME680_active
 //######################################### BME680 functions (BOSCH BSEC LP example) ########################################################
 
 void BME680_setup() {
 
-  if (debug) {
-    Serial.println("### BME680_setup");
-  }
+  if (debug) {Serial.println("### BME680_setup");}
 
   String output;
 
@@ -550,7 +424,8 @@ void BME680_setup() {
 
   iaqSensor.begin(BME680_I2C_ADDR_SECONDARY, Wire);
   output = "    BSEC library version " + String(iaqSensor.version.major) + "." + String(iaqSensor.version.minor) + "." + String(iaqSensor.version.major_bugfix) + "." + String(iaqSensor.version.minor_bugfix);
-  Serial.println(output);
+  if (debug) {Serial.println(output);}
+  
   BME680_checkIaqSensorStatus();
 
   iaqSensor.setConfig(bsec_config_iaq);
@@ -569,7 +444,7 @@ void BME680_setup() {
   iaqSensor.updateSubscription(sensorList, 5, BSEC_SAMPLE_RATE_LP);
   BME680_checkIaqSensorStatus();
 
-  BME680_activated = true;
+  bme680Activated = true;
 }
 
 void BME680_checkIaqSensorStatus() {
@@ -579,26 +454,26 @@ void BME680_checkIaqSensorStatus() {
   if (iaqSensor.status != BSEC_OK) {
     if (iaqSensor.status < BSEC_OK) {
       output = "    BSEC error code : " + String(iaqSensor.status);
-      Serial.println(output);
-      send_ErrorLog("Error: BME680 " + output);
+      if (debug) {Serial.println(output);}
+      mqtt_send(MQTT_topicDevice + "ErrorLog", "Error: BME680 " + output);
       reboot_on_error();
     } else {
       output = "    BSEC warning code : " + String(iaqSensor.status);
       Serial.println(output);
-      send_ErrorLog("Warning: BME680 " + output);
+      mqtt_send(MQTT_topicDevice + "ErrorLog", "Warning: BME680 " + output);
     }
   }
 
   if (iaqSensor.bme680Status != BME680_OK) {
     if (iaqSensor.bme680Status < BME680_OK) {
       output = "    BME680 error code : " + String(iaqSensor.bme680Status);
-      Serial.println(output);
-      send_ErrorLog("Error: BME680 " + output);
+      if (debug) {Serial.println(output);}
+      mqtt_send(MQTT_topicDevice + "ErrorLog", "Error: BME680 " + output);
       reboot_on_error();
     } else {
       output = "    BME680 warning code : " + String(iaqSensor.bme680Status);
-      Serial.println(output);
-      send_ErrorLog("Warning: BME680 " + output);
+      if (debug) {Serial.println(output);}
+      mqtt_send(MQTT_topicDevice + "ErrorLog", "Warning: BME680 " + output);
     }
   }
   iaqSensor.status = BSEC_OK;
@@ -606,9 +481,7 @@ void BME680_checkIaqSensorStatus() {
 
 void BME680_loadState() {
 
-  if (debug) {
-    Serial.println("### BME680_loadState");
-  }
+  if (debug) {Serial.println("### BME680_loadState");}
 
   if (EEPROM.read(0) == BSEC_MAX_STATE_BLOB_SIZE) {
     // Existing state in EEPROM
@@ -620,58 +493,47 @@ void BME680_loadState() {
         Serial.print(bsecState[i], HEX);
       }
     }
-    if (debug) {
-      Serial.print("\n");
-    }
+    if (debug) {Serial.print("\n");}
 
     iaqSensor.setState(bsecState);
     BME680_checkIaqSensorStatus();
 
-    HTTPClient http;  //send load state to iobroker
-    String sendURL = URL_BME680_loadState + "true";
-    http.begin(sendURL);
-    http.GET();
-    http.end();
+    mqtt_send(MQTT_topicData + "BME680_loadState", "true"); //send load state to iobroker
 
   } else {
     // Erase the EEPROM with zeroes
-    Serial.println("    Erasing EEPROM");
+    if (debug) {Serial.println("    Erasing EEPROM");}
 
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE + 1; i++)
       EEPROM.write(i, 0);
 
     EEPROM.commit();
 
-    HTTPClient http;  //send erase EEPROM to iobroker
-    String sendURL = URL_BME680_eraseEEPROM + "true";
-    http.begin(sendURL);
-    http.GET();
-    http.end();
+    mqtt_send(MQTT_topicData + "BME680_eraseEEPROM", "true"); //send erase EEPROM to iobroker
+    
   }
 }
 
 void BME680_updateState() {
 
-  if (debug) {
-    Serial.println("### BME680_updateState");
-  }
+  if (debug) {Serial.println("### BME680_updateState");}
 
   bool update = false;
   
   // Set a trigger to save the state. Here, the state is saved every STATE_SAVE_PERIOD with the first state being saved once the algorithm achieves full calibration, i.e. iaqAccuracy = 3
   
-  if (stateUpdateCounter == 0) {
+  if (bsecStateUpdateCounter == 0) {
     if (iaqSensor.iaqAccuracy >= 3) {
       update = true;
-      stateUpdateCounter++;
+      bsecStateUpdateCounter++;
     }
   } else {
 
     // Update every STATE_SAVE_PERIOD milliseconds
     
-    if ((stateUpdateCounter * STATE_SAVE_PERIOD) < millis()) {
+    if ((bsecStateUpdateCounter * STATE_SAVE_PERIOD) < millis()) {
       update = true;
-      stateUpdateCounter++;
+      bsecStateUpdateCounter++;
     }
   }
 
@@ -679,168 +541,150 @@ void BME680_updateState() {
     iaqSensor.getState(bsecState);
     BME680_checkIaqSensorStatus();
 
-    Serial.println("    Writing state to EEPROM");
+    if (debug) {Serial.println("    Writing state to EEPROM");}
 
     for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE ; i++) {
       EEPROM.write(i + 1, bsecState[i]);
-      if (debug) {
-        Serial.print(bsecState[i], HEX);
-      }
+      if (debug) { Serial.print(bsecState[i], HEX);}
     }
-    if (debug) {
-      Serial.print("\n");
-    }
+    if (debug) {Serial.print("\n");}
 
     EEPROM.write(0, BSEC_MAX_STATE_BLOB_SIZE);
     EEPROM.commit();
 
-    HTTPClient http;  //send update state to iobroker
-    String sendURL = URL_BME680_updateState + "true";
-    http.begin(sendURL);
-    http.GET();
-    http.end();
+    mqtt_send(MQTT_topicData + "BME680_updateState", "true"); //send update state to iobroker
+  
   }
 }
 
-void BME680_get_data() {
+void BME680_getData() {
 
-  if (debug) {
-    Serial.println("### BME680_get_data");
-  }
+  String bme680iaqD, bme680iaDA, bme680iaqS, bme680iaSA, bme680VOCe, bme680Temp, bme680Humi;
 
-  iaqD = String(iaqSensor.iaq);
-  iaDA = String(iaqSensor.iaqAccuracy);
-  iaqS = String(iaqSensor.staticIaq);
-  iaSA = String(iaqSensor.staticIaqAccuracy);
-  VOCe = String(iaqSensor.breathVocEquivalent);
-  temp = String(iaqSensor.temperature);
-  humi = String(iaqSensor.humidity);
+  if (debug) {Serial.println("### BME680_get_data");}
 
-  BME680_updateState();
+  bme680iaqD = String(iaqSensor.iaq);
+  bme680iaDA = String(iaqSensor.iaqAccuracy);
+  bme680iaqS = String(iaqSensor.staticIaq);
+  bme680iaSA = String(iaqSensor.staticIaqAccuracy);
+  bme680VOCe = String(iaqSensor.breathVocEquivalent);
+  bme680Temp = String(iaqSensor.temperature);
+  bme680Humi = String(iaqSensor.humidity);
 
   // if accuracy changed send data ASAP to iobroker (update accuracy value)
 
-  if (iaqSensor.staticIaqAccuracy != iaSAhistory) {
+  if (iaqSensor.staticIaqAccuracy != bme680iaSAhistory) {
     counter = 0;
-    iaSAhistory = iaqSensor.staticIaqAccuracy;
+    bme680iaSAhistory = iaqSensor.staticIaqAccuracy;
   }
+
+  if (debug) {BME680_serialOutput(bme680iaqD, bme680iaDA, bme680iaqS, bme680iaSA, bme680VOCe, bme680Temp, bme680Humi);}
+  if (counter <=0) {
+    BME680_sendData(bme680iaqD, bme680iaDA, bme680iaqS, bme680iaSA, bme680VOCe, bme680Temp, bme680Humi);
+    BME680_updateState();  
+  }
+  
 }
 
 void BME680_reset() {
 
-  if (debug) {
-    Serial.println("### BME680_reset");
-  }
+  if (debug) {Serial.println("### BME680_reset");}
 
-  HTTPClient http;
+  if (debug) {Serial.println("    Erasing EEPROM");}
 
-  String sendURL;
+  for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE + 1; i++) {EEPROM.write(i, 0);}
 
-  sendURL = URL_BME680_reset_get;
-  http.begin(sendURL);
-  http.GET();
+  EEPROM.commit();
 
-  String result = http.getString();
+  mqtt_send(MQTT_topicData + "BME680_reset", "false"); // update reset flag in iobroker
+  mqtt_send(MQTT_topicData + "BME680_eraseEEPROM", "true"); // send earase EEPROM to iobroker
 
-  if (debug) {
-    if (debug) {
-      Serial.println("    Reset: " + result);
-    }
-  }
-
-  if (result == "true") {
-
-    // Erase the EEPROM with zeroes
-    if (debug) {
-      Serial.println("    Erasing EEPROM");
-    }
-
-    for (uint8_t i = 0; i < BSEC_MAX_STATE_BLOB_SIZE + 1; i++)
-      EEPROM.write(i, 0);
-
-    EEPROM.commit();
-
-    sendURL = URL_BME680_reset_set + "false";
-    http.begin(sendURL);
-    http.GET();
-    sendURL = URL_BME680_eraseEEPROM + "true";
-    http.begin(sendURL);
-    http.GET();
-  }
-
-  http.end();
 }
 
-void BME680_serial_output() {
+void BME680_serialOutput(String bme680iaqD, String bme680iaDA, String bme680iaqS, String bme680iaSA, String bme680VOCe, String bme680Temp, String bme680Humi) {
 
-  String output = "BME680 -- ";
-  output += "iaqD=" + iaqD;
-  output += ", iaDA=" + iaDA;
-  output += ", iaqS=" + iaqS;
-  output += ", iaSA=" + iaSA;
-  output += ", VOCe=" + VOCe;
-  output += ", Temp=" + temp;
-  output += ", Humi=" + humi;
+  String output = "    BME680 -- ";
+  output += "iaqD=" + bme680iaqD;
+  output += ", iaDA=" + bme680iaDA;
+  output += ", iaqS=" + bme680iaqS;
+  output += ", iaSA=" + bme680iaSA;
+  output += ", VOCe=" + bme680VOCe;
+  output += ", Temp=" + bme680Temp;
+  output += ", Humi=" + bme680Humi;
 
   Serial.println(output);
 }
+
+void BME680_sendData(String bme680iaqD, String bme680iaDA, String bme680iaqS, String bme680iaSA, String bme680VOCe, String bme680Temp, String bme680Humi) {
+
+  if (debug) {Serial.println("    Send Data");}
+
+  mqtt_send(MQTT_topicData + "iaDA", bme680iaDA);
+  mqtt_send(MQTT_topicData + "iaSA", bme680iaSA);
+  mqtt_send(MQTT_topicData + "iaqD", bme680iaqD);
+  mqtt_send(MQTT_topicData + "iaqS", bme680iaqS);
+  mqtt_send(MQTT_topicData + "VOCe", bme680VOCe);
+
+}
+
 #endif
+
 
 #ifdef SCD30_active
 //######################################### SCD30 functions ########################################################
 
 void SCD30_setup() {
 
-  if (debug) {
-    Serial.println("### SCD30_setup");
-  }
+  if (debug) {Serial.println("### SCD30_setup");}
 
   Wire.begin();
 
   if (airSensor.begin(Wire) == false) {
 
-    if (debug) {
-      Serial.println("    Air sensor not detected. Please check wiring");
-    }
-    send_ErrorLog("Error: SCD30 Air sensor not detected. Please check wiring");
+    if (debug) {Serial.println("    Air sensor not detected. Please check wiring");}
+    
+    mqtt_send(MQTT_topicDevice + "ErrorLog", "Error: SCD30 Air sensor not detected. Please check wiring");
     reboot_on_error();
   }
   else {
-    if (debug) {
-      Serial.println("     Air sensor found.");
-    }
+    if (debug) {Serial.println("    Air sensor found.");}
   }
 
-  airSensor.setMeasurementInterval(scd30_interval);
+  airSensor.setMeasurementInterval(scd30Interval);
   //airSensor.setAltitudeCompensation(scd30_altitude);
   airSensor.setAmbientPressure(1013);
-  airSensor.setTemperatureOffset(scd30_offset);
+  airSensor.setTemperatureOffset(scd30Offset);
 
-  SCD30_activated = true;
+  scd30Activated = true;
 }
 
-void SCD30_get_data() {
+void SCD30_getData() {
 
-  if (debug) {
-    Serial.println("### SCD30_get_data");
-  }
+  String scd30Co2, scd30Humi, scd30Temp;
+  
+  if (debug) {Serial.println("### SCD30_getData");}
 
   // collect SCD30 data
 
   if (airSensor.dataAvailable())
   {
-    scd30_co2 = String(airSensor.getCO2());
-    scd30_temp = String(airSensor.getTemperature());
-    scd30_humi = String(airSensor.getHumidity());
+    scd30Co2 = String(airSensor.getCO2());
+    scd30Temp = String(airSensor.getTemperature());
+    scd30Humi = String(airSensor.getHumidity());
+    ePaperCO2 = scd30Co2;
+
+    if (debug) {SCD30_serialOutput(scd30Co2, scd30Humi, scd30Temp);}
+    
+    if (counter <=0) {
+    
+      SCD30_SendData(scd30Co2);
+      airSensor.setAmbientPressure(bme280Pressure); // update ambient pressure preset from BME280
+      if (debug) {Serial.println("    Ambient pressure = " + String(bme280Pressure));}
+    }
   }
   else {
-    Serial.println("    SCD30 no data");
+    if (debug) {Serial.println("    SCD30 no data");}
   }
-
-  if (debug) {
-    Serial.println("    Ambient pressure = " + String(bme280_pressure));
-  }
-  airSensor.setAmbientPressure(bme280_pressure); // update ambient pressure preset from BME280
 
 }
 
@@ -848,24 +692,16 @@ void SCD30_AutoCal() {
 
   if (debug) {Serial.println("### SCD30_AutoCal");}
 
-  String scd30_autoCal_get = bool_to_string(airSensor.getAutoSelfCalibration());
-  if (debug) {Serial.println("    scd30_autoCal_get = " + scd30_autoCal_get);}
-
-  HTTPClient http;
-
-  String sendURL;
-  sendURL = URL_SCD30_autoCal;
-  http.begin(sendURL);
-  http.GET();
-
-  String scd30_autoCal = http.getString();
+  bool scd30_autoCal_get = airSensor.getAutoSelfCalibration();
   
-  http.end();
+  if (debug) {
+    Serial.println("    scd30_autoCal_get = " + bool_to_string(scd30_autoCal_get));
+    Serial.println("    scd30AutoCal = " + bool_to_string(scd30AutoCal));
+  
+  }
 
-  if (debug) {Serial.println("    scd30_autoCal = " + scd30_autoCal);}
-
-  if (scd30_autoCal_get != scd30_autoCal) {
-    if (scd30_autoCal == "true") {
+  if (scd30_autoCal_get != scd30AutoCal) {
+    if (scd30AutoCal) {
 
       airSensor.setAutoSelfCalibration(true);
       if (debug) {Serial.println("    Enable SCD30 AutoCalibration");}
@@ -878,19 +714,30 @@ void SCD30_AutoCal() {
   }
 }
 
-void SCD30_serial_output() {
+void SCD30_serialOutput(String scd30Co2, String scd30Humi, String scd30Temp) {
 
-  String output = "SCD30 -- ";
-  output += "CO2=" + scd30_co2;
-  output += ", temp=" + scd30_temp;
-  output += ", humi=" + scd30_humi;
+  String output = "    SCD30 -- ";
+  output += "CO2=" + scd30Co2;
+  output += ", temp=" + scd30Temp;
+  output += ", humi=" + scd30Humi;
 
   Serial.println(output);
 }
+
+void SCD30_SendData(String scd30Co2) {
+
+  if (debug) {Serial.println("    Send Data");}
+
+  mqtt_send(MQTT_topicData + "co2", scd30Co2);
+}
+
 #endif
+
 
 #ifdef SPS30_active
 //######################################### SPS30 functions ########################################################
+
+// WARNING the SPS30 section is not yet converted to MQTT! Please use the latest version of F5!
 
 void SPS30_setup() {
 
@@ -1168,6 +1015,72 @@ void SPS30_get_dynamic_config() {
 }
 
 #endif
+
+
+#ifdef ADS1115_active
+//######################################### ADS1115 Section #######################################################
+
+void ADS1115_setup() {
+
+  if (debug) {Serial.println("    ADS1115_setup");}
+
+  ads1115.begin();  // Initialize ads1115
+  ads1115.setGain(GAIN_ONE); 
+
+  ads1115Activated = true;
+ 
+}
+
+#endif
+
+
+#ifdef ADS1115_daylightSensorActive
+//----------------------------------------- ADS1115 DaylightSensor SubSection -------------------------------------------------------
+
+void ADS1115_daylightSensorSetup() {
+
+  if (debug) {Serial.println("### ADS1115_daylightSensorSetup");}
+  
+  if (!ads1115Activated) {ADS1115_setup();}
+  ads1115DaylightSensorActivated = true;
+  
+}
+
+void ADS1115_daylightSensorGetData() {
+
+  if (debug) {Serial.println("### ADS1115_daylightSensorGetData");}
+
+  int16_t ads1115Daylight01 = ads1115.readADC_SingleEnded(0);
+  int16_t ads1115Daylight02 = ads1115.readADC_SingleEnded(1);
+
+  if (debug) {ADS1115_daylightSensorSerialOutput(ads1115Daylight01, ads1115Daylight02);}
+  if (counter <=0) {ADS1115_daylightSensorSendData(ads1115Daylight01, ads1115Daylight02);}
+}
+
+void ADS1115_daylightSensorSerialOutput(int16_t ads1115Daylight01, int16_t ads1115Daylight02) {
+
+  if (debug) {
+    
+    String output = "    ads1115Daylight01 = ";
+    output += String(ads1115Daylight01);
+    output += " -- ads1115Daylight02 = ";
+    output += String(ads1115Daylight02);
+    
+    Serial.println(output);
+  }
+}
+
+void ADS1115_daylightSensorSendData(int16_t ads1115Daylight01, int16_t ads1115Daylight02) {
+
+  if (debug) {Serial.println("    Send Data");}
+
+  mqtt_send(MQTT_topicData + "DayLight01", String(ads1115Daylight01));
+  mqtt_send(MQTT_topicData + "DayLight02", String(ads1115Daylight02));    
+
+}
+
+#endif
+
 
 #ifdef WindSensor_active
 //######################################### wind speed sensor section #######################################################
