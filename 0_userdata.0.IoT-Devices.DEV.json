@@ -282,4 +282,28 @@
       "ownerGroup": "system.group.administrator"
     }
   }
+    "0_userdata.0.IoT-Devices.DEV.Config.DeepSleep": {
+    "_id": "0_userdata.0.IoT-Devices.DEV.Config.DeepSleep",
+    "type": "state",
+    "common": {
+      "name": "LED",
+      "role": "",
+      "type": "boolean",
+      "read": true,
+      "write": true,
+      "desc": "Activates Deep Sleep Mode",
+      "def": false
+    },
+    "native": {},
+    "from": "system.adapter.admin.0",
+    "user": "system.user.admin",
+    "ts": 1625469694674,
+    "acl": {
+      "object": 1636,
+      "state": 1636,
+      "owner": "system.user.admin",
+      "ownerGroup": "system.group.administrator"
+    }
+  }
+
 }

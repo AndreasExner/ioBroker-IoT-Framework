@@ -2,7 +2,7 @@
 
 **ioBroker IoT Framework (based on NodeMCU / ESP8266)**
 
-**Current version: 6.0.0 (F6)**
+**Current version: 6.1.1 (F6)**
 
 
 
@@ -14,9 +14,30 @@ With the **5th generation**, the Framework was completely restructured because t
 
 With the **6th generation**, I've started to replace HTTP-Rest with MQTT. **F5 and F6 are no longer compatible!** 
 
+
+
 **Important:**
 
 Be sure to have this file in the same folder like the primary .ino file. Opening the primary .ino file in Arduino editor should loaded  the extension automatically.
+
+
+
+**Supported features / sensors:**
+
+  - Wifi
+  - Deep Sleep (Tested with ESP8266 only! Requires shortcut between D0 and RST!)
+  - MQTT (NEW in 6.0)
+  - BME280
+  - BME680
+  - SCD30
+  - SPS30 (WARNING the SPS30 section is not yet converted to MQTT! Please use the latest version of F5!)
+  - WindSensor (WARNING the WindSensor section is not yet converted to MQTT! Please use the latest version of F5!)
+  - ePaper Displays (code for IndoorAirSensor)
+  - ADS1115 (code for DaylightSensor)
+
+
+
+**WARNING: Framework version 6 deprecates the formerly used HTTP/REST API for the ioBrober communication. It was replaced by MQTT.** 
 
 
 
@@ -42,6 +63,11 @@ Be sure to have this file in the same folder like the primary .ino file. Opening
 
 
 ## History
+
+6.1.1: Deep Sleep Update
+
+- Deep Sleep option for ESP8266
+- general code improvements
 
 **6.0.0: Initial Release for MQTT**
 
@@ -126,7 +152,7 @@ The Bosch BSEC library uses precompiled libraries. See the appendix for some cha
 
 - Create a folder in your Arduino library folder
 - Copy the primary sketch (e.g. DEV_6.0.ino) and the extension file (AEX_iobroker_IoT_Framework.ino) into the folder
-  - be sure to include the secret files (MQTT_secret.h and WiFi_secret.h) as well
+  - be sure to include the secret files (MQTT_secret.h and WiFi_secret.h) as well as the datapoint mapping files
 - Open the primary sketch (e.g. DEV_6.0.ino) 
   - edit code  as needed and don't forget to change the secrets as well
 - Optional: install required libraries into your Arduino IDE
@@ -185,6 +211,7 @@ int intervalDelay = 1000; // in ms
 - **`interval`** defines the time between two data transmissions (interval * intervalDelay). This value is used initially after boot. The interval can dynamically updated from iobroker
 - **`intervalDelay`** defines the waiting time at the end of each loop. This value is used initially after boot. The interval can dynamically updated from iobroker (this value has no effect if the BME680 sensor is activated!)
 - The **`deviceActive`** switch enables sensors and data transmissions. This is very useful to test a sketch on the bread board without the connected hardware. It is disabled by default and gets dynamically changed by the iobrocker, as long as nothing else is configured.
+- The **`DeepSleep`** switch controls deep sleep during runtime. With deep sleep active, the devices runs exactly one measurement and enters deep sleep for the "interval" time. With deep sleep inactive, the device cycles through the loops and transmits data every "interval"
 
 #### MQTT section
 
@@ -212,8 +239,8 @@ The device section contains the configuration and status information about the I
 The MQTT topic for the device section is a combination of the MQTT_deviceRootPath and the deviceID. For example:
 
 ```
-0_userdata/0/IoT-Devices + /DEV -> topic for device state
-0_userdata/0/IoT-Devices + /DEV + /Config -> topic for device config (subscription)
+0_userdata/0/IoT-Devices + /NAME -> topic for device state
+0_userdata/0/IoT-Devices + /NAME + /Config -> topic for device config (subscription)
 ```
 
 The default path for the devices root folder is: **`0_userdata.0.IoT-Devices`**. When the path is changed in ioBroker, it has to be changed in the sketch as well.
@@ -234,6 +261,7 @@ The default path for the devices root folder is: **`0_userdata.0.IoT-Devices`**.
   - **`/DeviceActive`** [true] enables / disables **all** sensors and data transmits
   - **`/Interval`** [10] data transmit every n-th loop
   - **`/LED`** [true] enables / disables status LED
+  - **`/DeepSleep`** [false] enables / disables DeepSleep
 
 
 
@@ -244,8 +272,8 @@ In the data section, all the sensor data will be stored. In addition, some optio
 The MQTT topic for the data section is a combination of the MQTT_????DataRootPath and the deviceName. For example:
 
 ```
-0_userdata/0/IoT + /DaylightSensor -> topic for production data
-0_userdata/0/IoT-Dev + /DaylightSensor -> topic for development data
+0_userdata/0/IoT + /NAME -> topic for production data
+0_userdata/0/IoT-Dev + /NAME -> topic for development data
 ```
 
 
@@ -307,7 +335,6 @@ The data section must contain at least one state:
 - Send device state
 - Get initial configuration from ioBroker
   - Subscribe MQTT device config topics
-  - Get (parse) MQTT messages (device & sensor specific config)
   - Subscribe MQTT sensor specific config topics
   - Get (parse) MQTT messages (device & sensor specific config)
 - Run sensor setup (if deviceActive = true)
@@ -319,6 +346,10 @@ The main loop has a default frequency of round about 1 Hz (1000ms **`delay`**) a
 In each loop, the data of all (active) sensors are measured and possible MQTT messages are parsed to obtain config changes. This includes the setup for disabled sensors. Optionally, the data can be send as a debug log to the serial interface of the device.
 
 Every n-th loop, defined by the **`Interval`**, the data is transmitted to ioBroker and the optional ePaper display is updated.
+
+
+
+If **`DeepSleep`** is active, all code in the loop will be executed once and the device will enter deep sleep for the  **`Interval`** time. The device will be reset after the  **`Interval`** time. The LED is on during excecution and off during deep sleep.
 
 
 
