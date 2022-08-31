@@ -16,12 +16,6 @@ With the **6th generation**, I've started to replace HTTP-Rest with MQTT. **F5 a
 
 
 
-**Important:**
-
-Be sure to have this file in the same folder like the primary .ino file. Opening the primary .ino file in Arduino editor should loaded  the extension automatically.
-
-
-
 **Supported features / sensors:**
 
   - Wifi
@@ -158,6 +152,7 @@ The Bosch BSEC library uses precompiled libraries. See the appendix for some cha
 - Optional: install required libraries into your Arduino IDE
 - Create (import) the datapoints in iobroker
 - Set values for datapoints (see iobroker datapoints)
+- **Important:** For the scheduled deep sleep wakeup / reset connect D0 and RST pin
 
 
 
