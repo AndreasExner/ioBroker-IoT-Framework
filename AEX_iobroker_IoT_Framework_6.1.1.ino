@@ -216,6 +216,7 @@ void mqtt_getDeviceConfig() {
 
   String mqttTopic, mqttMessage;
   int mqttMessageSize = mqttClient.parseMessage();
+  int initialMqttMessageSize = mqttMessageSize;
   int intervalHistory = interval;
  
   while (mqttMessageSize) {
@@ -247,13 +248,13 @@ void mqtt_getDeviceConfig() {
     mqttMessageSize = mqttClient.parseMessage();
   }
 
-  if (debug) {Serial.println("    Interval: " + String(interval) + " - Delay: " + String(intervalDelay) + " - Debug: " + bool_to_string(debug) + " - LED: " + bool_to_string(ledActive) + " - DEV: " + bool_to_string(devMode) + " - deviceActive: " + bool_to_string(deviceActive) + " - deepSleepEnabled: " + bool_to_string(deepSleepEnabled));}
+  if (debug && initialMqttMessageSize > 0) {Serial.println("    Interval: " + String(interval) + " - Delay: " + String(intervalDelay) + " - Debug: " + bool_to_string(debug) + " - LED: " + bool_to_string(ledActive) + " - DEV: " + bool_to_string(devMode) + " - deviceActive: " + bool_to_string(deviceActive) + " - deepSleepEnabled: " + bool_to_string(deepSleepEnabled));}
 
   // switch to prod mode if configured in iobroker. MUST be executed after the first run of mqtt_getSensorConfig!
   if (devMode) {MQTT_topicData = MQTT_topicDataDEV;}
   else {MQTT_topicData = MQTT_topicDataPROD;}
 
-  if (interval != intervalHistory) {counter = 0;}
+  if (interval != intervalHistory) {counter = 0;} // run transmission on every config change
 
 }
 

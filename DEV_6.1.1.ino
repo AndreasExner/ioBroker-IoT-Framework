@@ -350,7 +350,7 @@ void loop(void) {
 
   // +++++++++++++++++++++ Start loop
 
-  if(DeepSleep){digitalWrite(LED, HIGH);} // set LED on during execution in deep sleep mode
+  if(deepSleepEnabled){digitalWrite(LED, HIGH);} // set LED on during execution in deep sleep mode
   
   if (debug) {Serial.println("--- Loop " + String(counter) + " of " + String(interval));}
 
@@ -449,14 +449,16 @@ void loop(void) {
   }
 
 
+  // +++++++++++++++++++++ look for config changes
+
+  mqtt_getState(); // check mqtt connection state
+  mqtt_getDeviceConfig(); // update sensor config
+  
   // +++++++++++++++++++++ Transmission Interval 
   
   if (counter <= 0) { //reset counter
     counter = interval;
-   
-    mqtt_getState(); // check mqtt connection state
-    mqtt_getDeviceConfig(); // update sensor config
-    delay(1000);
+
     mqtt_sendDeviceState(); // send device state
     delay(2000);
   
